@@ -12,7 +12,7 @@ jobs:
       uses: actions/checkout@v4
   Deploy: 
     needs: Prepare
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     env:
       # AZURE_IDENTITY: ${{ vars.AZURE_IDENTITY || '2cf25ef0-3b61-4bd8-b433-d92d8addde3e' }}
       # AZURE_SUBSCRIPTION: ${{ vars.AZURE_SUBSCRIPTION || '881a577a-6e04-4569-966d-b0cdf6fe5c71' }}
