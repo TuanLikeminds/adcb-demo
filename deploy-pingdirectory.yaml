@@ -1,0 +1,41 @@
+name: Deploy PingDirectory to GCP
+on:
+  push:
+    tags: pd-v**
+
+
+jobs:
+  Prepare:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout GitOps repository
+      uses: actions/checkout@v4
+  Deploy: 
+    needs: Prepare
+    runs-on: self-hosted
+    env:
+      AZURE_IDENTITY: ${{ vars.AZURE_IDENTITY || '2cf25ef0-3b61-4bd8-b433-d92d8addde3e' }}
+      AZURE_SUBSCRIPTION: ${{ vars.AZURE_SUBSCRIPTION || '881a577a-6e04-4569-966d-b0cdf6fe5c71' }}
+      AZURE_AKS_CLUSTER_NAME: ${{ vars.AZURE_AKS_CLUSTER_NAME || 'aks-ciam-dev-uan-60gqi9' }}
+      AZURE_AKS_CLUSTER_RESOURCE_GROUP: ${{ vars.AZURE_AKS_CLUSTER_RESOURCE_GROUP || 'rg-ciam-dev-uaenorth-aks' }}
+      BASE_IMAGE_TAG: 2403-10.0.0.2
+      AZURE_CONTAINER_REGISTRY: "pingdevops"
+      PRODUCT_NAME: "pingdirectory"
+      BASE_IMAGE_ACR_REGISTRY_URL: ""
+      PING_PRODUCT_ACR_REGISTRY_URL: ""
+      
+    steps:
+    - name: Set env
+      id: set-image-tag
+      run: echo "RELEASE_TAG=${GITHUB_REF#refs/*/}-${BASE_IMAGE_TAG}" >> $GITHUB_ENV
+
+    - name: Checkout GitOps repository
+      uses: actions/checkout@v4
+      
+    - name: Set executable permission
+      run: chmod +x .github/workflows/workflow-steps.sh
+
+    - name: Deploy PingDirectory to DEV
+      run: .github/workflows/workflow-steps.sh deploy_pingdirectory_dev
+      
+
