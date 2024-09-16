@@ -21,11 +21,11 @@ jobs:
       BASE_IMAGE_TAG: "2408"
       BASE_IMAGE_REPOSITORY: "pingidentity-base-images/pingdirectory"
       PRODUCT_NAME: "pingdirectory"
-      ACR_REGISTRY_NAME: "pingdevops"
-      ACR_REGISTRY_URL: "pingdevops.azurecr.io"
+      ACR_REGISTRY_NAME: "likeminds"
+      ACR_REGISTRY_URL: "likeminds.azurecr.io"
       
 
-      
+
     steps:
     - name: Set Release Tag Variable using Github Release tag# and Base Image tag
       id: set-image-tag
