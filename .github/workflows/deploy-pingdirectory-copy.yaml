@@ -42,5 +42,5 @@ jobs:
       run: .github/workflows/workflow-steps.sh build_pingdirectory_image
 
     - name: Deploy PingDirectory to DEV
-      run: .github/workflows/workflow-steps.sh deploy_pingdirectory
+      run: .github/workflows/workflow-steps.sh deploy_pingdirectory_dev
     
