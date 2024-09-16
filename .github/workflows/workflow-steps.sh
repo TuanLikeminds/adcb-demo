@@ -98,7 +98,7 @@ deploy_pingdirectory_dev() {
   --build-arg ACR_REGISTRY_URL=$ACR_REGISTRY_URL \
   --build-arg BASE_IMAGE_TAG=$BASE_IMAGE_TAG \
   --build-arg BASE_IMAGE_REPOSITORY=$BASE_IMAGE_REPOSITORY \
-  -f pingdirectory/Dockerfile ./pingdirectory
+  -f pingdirectory/Dockerfile /pingdirectory
 
 
 
