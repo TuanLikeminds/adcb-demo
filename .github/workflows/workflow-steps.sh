@@ -108,6 +108,7 @@ build_pingdirectory_image() {
 
 deploy_pingdirectory_dev(){
   curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+  az aks get-credentials --name "keyvault-demo-cluster" --resource-group "pingdevops-rg"
   kubectl delete cm global-env-vars -n ciam-dev
   helm upgrade --install  pingdirectory-release  ping-devops --version 0.10.0 --repo https://helm.pingidentity.com -f pingdirectory/helm/dev/pingdirectory-values.yaml --namespace ciam-dev  --set pingdirectory.image.tag=$RELEASE_TAG  --force 
   kubectl get pods -n ciam-dev
