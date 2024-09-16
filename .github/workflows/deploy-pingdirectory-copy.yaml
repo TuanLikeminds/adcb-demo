@@ -20,22 +20,24 @@ jobs:
       # AZURE_AKS_CLUSTER_RESOURCE_GROUP: ${{ vars.AZURE_AKS_CLUSTER_RESOURCE_GROUP || 'rg-ciam-dev-uaenorth-aks' }}
       BASE_IMAGE_TAG: "2408"
       BASE_IMAGE_REPOSITORY: "pingidentity-base-images/pingdirectory"
-      PRODUCT_IMAGE_REPOSITORY: "pingdirectory"
-      AZURE_CONTAINER_REGISTRY: "pingdevops"
       PRODUCT_NAME: "pingdirectory"
-      ACR_REGISTRY_NAME: "baseimage"
-      ACR_REGISTRY_URL: "baseimage.azurecr.io"
+      ACR_REGISTRY_NAME: "pingdevops"
+      ACR_REGISTRY_URL: "pingdevops.azurecr.io"
       
     steps:
-    - name: Set env
+    - name: Set Release Tag Variable using Github Release tag# and Base Image tag
       id: set-image-tag
       run: echo "RELEASE_TAG=${GITHUB_REF#refs/*/}-${BASE_IMAGE_TAG}" >> $GITHUB_ENV
+      # Creates the release tag that the docker image will be created
 
     - name: Checkout GitOps repository
       uses: actions/checkout@v4
       
     - name: Set executable permission
       run: chmod +x .github/workflows/workflow-steps.sh
+
+    - name: Build and push Ping Directory Docker image to ACR
+      run: .github/workflows/workflow-steps.sh deploy_pingdirectory_dev
 
     - name: Deploy PingDirectory to DEV
       run: .github/workflows/workflow-steps.sh deploy_pingdirectory_dev

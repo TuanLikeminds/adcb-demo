@@ -4,17 +4,14 @@ AZURE_IDENTITY=$AZURE_IDENTITY
 AZURE_SUBSCRIPTION=$AZURE_SUBSCRIPTION
 AZURE_AKS_CLUSTER_NAME=$AZURE_AKS_CLUSTER_NAME
 AZURE_AKS_CLUSTER_RESOURCE_GROUP=$AZURE_AKS_CLUSTER_RESOURCE_GROUP
-AZURE_CONTAINER_REGISTRY=$AZURE_CONTAINER_REGISTRY
 PRODUCT_NAME=$PRODUCT_NAME
 ACR_REGISTRY_URL=$ACR_REGISTRY_URL
 RELEASE_TAG=$RELEASE_TAG
 ACR_REGISTRY_NAME=$ACR_REGISTRY_NAME
-PING_PRODUCT_ACR_REGISTRY_URL=$PING_PRODUCT_ACR_REGISTRY_URL
 BASE_IMAGE_TAG=$BASE_IMAGE_TAG
 BASE_IMAGE_REPOSITORY=$BASE_IMAGE_REPOSITORY
 PRODUCT_NAME=$PRODUCT_NAME
 ACR_REGISTRY_URL=$ACR_REGISTRY_URL
-PRODUCT_IMAGE_REPOSITORY=$PRODUCT_IMAGE_REPOSITORY
 
 apply_overlays() {
   echo "Applying overlays..."
@@ -66,20 +63,18 @@ apply_overlays() {
   kubectl get pods -n ciam-dev
 }
 
-deploy_pingdirectory_dev() {
-  #s
-  # echo "Azure login"
-  # export APPSETTING_WEBSITE_SITE_NAME='azcli-workaround'
-  # az login --identity --username $AZURE_IDENTITY
-  # az account set --subscription $AZURE_SUBSCRIPTION
+build_pingdirectory_image() {
+
   echo "Azure login"
   az login --service-principal -u "6fca71cf-2e16-48fd-9c52-cb1d0f72b898" -p "r6U8Q~JYsjXxkjeILYVegugmEtBgxwv9sBxCXbDO" --tenant "daecf046-26ba-44b7-bdd6-032e51085396"
   echo "Building $PRODUCT_NAME Image: $RELEASE_TAG"
   echo "Deploying $PRODUCT_NAME - DEV"
   echo "Logging into ACR"
-  az acr login --name baseimage
+  az acr login --name pingdevops
+  
+  #STEP 1 - CHECK IF THE BASE IMAGE EXISTS IN THE BASE IMAGE REPOSITORY
   echo "Check if $PRODUCT_NAME Base image $BASE_IMAGE_TAG exists"
-
+  echo 
   # Check if the base image exists in the Azure Container Registry (ACR)
   if ! az acr repository show-tags --name $ACR_REGISTRY_NAME --repository $BASE_IMAGE_REPOSITORY --output tsv | grep -q "$BASE_IMAGE_TAG"; then
   #Scripts throws and exception and exits If the base image tag does not exist in ACR
@@ -91,35 +86,27 @@ deploy_pingdirectory_dev() {
 
   echo "Base image tag $BASE_IMAGE_TAG found. $PRODUCT_NAME Image $RELEASE_TAG will be built using this image..."
 
-  echo "building PinDirectory image and pushing it to ACR"
-  az acr build \
+
+
+  #STEP 2 - IF THE BASE IMAGE EXISTS, THEN INJECT THE SERVER PROFILE INTO THE IMAGE AND PUSH IT TO ACR
+  echo "building $PRODUCT_NAME image and pushing it to ACR"
+
+  if ! az acr build \
   --registry $ACR_REGISTRY_NAME \
   --image $PRODUCT_NAME:$RELEASE_TAG \
   --build-arg ACR_REGISTRY_URL=$ACR_REGISTRY_URL \
   --build-arg BASE_IMAGE_TAG=$BASE_IMAGE_TAG \
   --build-arg BASE_IMAGE_REPOSITORY=$BASE_IMAGE_REPOSITORY \
-  -f pingdirectory/Dockerfile pingdirectory/
+  -f $PRODUCT_NAME/Dockerfile $PRODUCT_NAME/; then
+  
+  # If the build fails, throw an error and exit the script
+  echo "Error: Failed to build $PRODUCT_NAME image and push it to ACR... Exiting the Deployment Pipeline..."
+  exit 1
+  fi
+
+echo "$PRODUCT_NAME image successfully built and pushed to ACR."
 
 
-
-  # echo "Azure login"
-  # export APPSETTING_WEBSITE_SITE_NAME='azcli-workaround'
-  # az login --identity --username $AZURE_IDENTITY
-  # az account set --subscription $AZURE_SUBSCRIPTION
-
-  # echo "Getting Azure AKS credentials"
-  # az aks get-credentials --name $AZURE_AKS_CLUSTER_NAME --resource-group $AZURE_AKS_CLUSTER_RESOURCE_GROUP
-
-  # echo "AKS apply credentials"
-  # kubelogin convert-kubeconfig -l azurecli
-  # # @TODO: Remove yq lines after aks-54uma725.privatelink.uaenorth.azmk8s.io gets added to InfoBlox
-  # yq e -i '.clusters[].cluster.server = "https://aks-pbky1iij.hcp.uaenorth.azmk8s.io:443"' ~/.kube/config
-  # yq e -i '.clusters[].cluster.certificate-authority-data = null' ~/.kube/config
-  # yq e -i '.clusters[].cluster.insecure-skip-tls-verify = true' ~/.kube/config
-
-  # echo "Configure ACR Access"
-  # az configure --defaults acr=${{ env.AZURE_CONTAINER_REGISTRY }}
-  # az acr build -t  -t ${{ env.ACR_REGISTRY_URL }}/${{ env.PRODUCT_NAME }}:${{ env.RELEASE_TAG }}
 
 
 
