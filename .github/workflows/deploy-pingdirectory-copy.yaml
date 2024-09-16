@@ -20,10 +20,11 @@ jobs:
       # AZURE_AKS_CLUSTER_RESOURCE_GROUP: ${{ vars.AZURE_AKS_CLUSTER_RESOURCE_GROUP || 'rg-ciam-dev-uaenorth-aks' }}
       BASE_IMAGE_TAG: "2408"
       BASE_IMAGE_REPOSITORY: "pingidentity-base-images/pingdirectory"
+      PRODUCT_IMAGE_REPOSITORY: "pingdirectory"
       AZURE_CONTAINER_REGISTRY: "pingdevops"
       PRODUCT_NAME: "pingdirectory"
       ACR_REGISTRY_NAME: "baseimage"
-      PING_PRODUCT_ACR_REGISTRY_URL: "sfdf"
+      ACR_REGISTRY_URL: "baseimage.azurecr.io"
       
     steps:
     - name: Set env

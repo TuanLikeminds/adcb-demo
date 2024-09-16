@@ -13,6 +13,8 @@ PING_PRODUCT_ACR_REGISTRY_URL=$PING_PRODUCT_ACR_REGISTRY_URL
 BASE_IMAGE_TAG=$BASE_IMAGE_TAG
 BASE_IMAGE_REPOSITORY=$BASE_IMAGE_REPOSITORY
 PRODUCT_NAME=$PRODUCT_NAME
+ACR_REGISTRY_URL=$ACR_REGISTRY_URL
+PRODUCT_IMAGE_REPOSITORY=$PRODUCT_IMAGE_REPOSITORY
 
 apply_overlays() {
   echo "Applying overlays..."
@@ -66,6 +68,10 @@ apply_overlays() {
 
 deploy_pingdirectory_dev() {
   #s
+  # echo "Azure login"
+  # export APPSETTING_WEBSITE_SITE_NAME='azcli-workaround'
+  # az login --identity --username $AZURE_IDENTITY
+  # az account set --subscription $AZURE_SUBSCRIPTION
   echo "Azure login"
   az login --service-principal -u "6fca71cf-2e16-48fd-9c52-cb1d0f72b898" -p "r6U8Q~JYsjXxkjeILYVegugmEtBgxwv9sBxCXbDO" --tenant "daecf046-26ba-44b7-bdd6-032e51085396"
   echo "Building $PRODUCT_NAME Image: $RELEASE_TAG"
@@ -76,14 +82,23 @@ deploy_pingdirectory_dev() {
 
   # Check if the base image exists in the Azure Container Registry (ACR)
   if ! az acr repository show-tags --name $ACR_REGISTRY_NAME --repository $BASE_IMAGE_REPOSITORY --output tsv | grep -q "$BASE_IMAGE_TAG"; then
+  #Scripts throws and exception and exits If the base image tag does not exist in ACR
     echo "Error: Base image $BASE_IMAGE_REPOSITORY:$BASE_IMAGE_TAG does not exist in the ACR repository.... Exiting The Deployment Pipeline..."
     echo "Push $BASE_IMAGE_REPOSITORY:$BASE_IMAGE_TAG to the $ACR_REGISTRY_NAME Registry to continue..."
     
     exit 1
   fi
+
   echo "Base image tag $BASE_IMAGE_TAG found. $PRODUCT_NAME Image $RELEASE_TAG will be built using this image..."
 
-
+  echo "building PinDirectory image and pushing it to ACR"
+  az acr build \
+  --registry $ACR_REGISTRY_NAME \
+  --image $BASE_IMAGE_REPOSITORY:$BASE_IMAGE_TAG \
+  --build-arg ACR_REGISTRY_URL=$ACR_REGISTRY_URL \
+  --build-arg BASE_IMAGE_TAG=$BASE_IMAGE_TAG \
+  --build-arg BASE_IMAGE_REPOSITORY=$BASE_IMAGE_REPOSITORY \
+  -f pingdirectory/Dockerfile
 
 
 
