@@ -21,7 +21,7 @@ jobs:
       BASE_IMAGE_TAG: 2403-10.0.0.2
       AZURE_CONTAINER_REGISTRY: "pingdevops"
       PRODUCT_NAME: "pingdirectory"
-      BASE_IMAGE_ACR_REGISTRY_URL: "fsdfdf"
+      BASE_IMAGE_ACR_REPOSITORY_URL: "baseimage.azurecr.io"
       PING_PRODUCT_ACR_REGISTRY_URL: "sfdf"
       
     steps:
@@ -39,3 +39,4 @@ jobs:
       run: .github/workflows/workflow-steps.sh deploy_pingdirectory_dev
       
 
+pingdirectory:2408

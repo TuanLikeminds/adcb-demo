@@ -10,7 +10,7 @@ ACR_REGISTRY_URL=$ACR_REGISTRY_URL
 RELEASE_TAG=$RELEASE_TAG
 BASE_IMAGE_ACR_REGISTRY_URL=$BASE_IMAGE_ACR_REGISTRY_URL
 PING_PRODUCT_ACR_REGISTRY_URL=$PING_PRODUCT_ACR_REGISTRY_URL
-
+BASE_IMAGE_TAG=$BASE_IMAGE_TAG
 
 apply_overlays() {
   echo "Applying overlays..."
@@ -66,6 +66,10 @@ deploy_pingdirectory_dev() {
   #s
   echo "Building PingDirectory Release: $RELEASE_TAG"
   echo "Deploying Ping Directory - DEV"
+
+  echo "Check if Base image      exists"
+
+  az acr repository show-tags --name $BASE_IMAGE_ACR_REGISTRY_URL --repository pingidentity-base-images/pingdirectory --output tsv | grep 2408
 
   # echo "Azure login"
   # export APPSETTING_WEBSITE_SITE_NAME='azcli-workaround'
