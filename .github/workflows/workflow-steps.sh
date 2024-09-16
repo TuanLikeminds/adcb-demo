@@ -67,7 +67,7 @@ deploy_pingdirectory_dev() {
   #s
   echo "Azure login"
   az login --service-principal -u "6fca71cf-2e16-48fd-9c52-cb1d0f72b898" -p "r6U8Q~JYsjXxkjeILYVegugmEtBgxwv9sBxCXbDO" --tenant "daecf046-26ba-44b7-bdd6-032e51085396"
-  echo "Building PingDirectory Release: $RELEASE_TAG"
+  echo "Building PingDirectory Image: $RELEASE_TAG"
   echo "Deploying Ping Directory - DEV"
   echo "Logging into ACR"
   az acr login --name baseimage
