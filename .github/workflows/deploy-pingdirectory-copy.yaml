@@ -18,7 +18,7 @@ jobs:
       # AZURE_SUBSCRIPTION: ${{ vars.AZURE_SUBSCRIPTION || '881a577a-6e04-4569-966d-b0cdf6fe5c71' }}
       # AZURE_AKS_CLUSTER_NAME: ${{ vars.AZURE_AKS_CLUSTER_NAME || 'aks-ciam-dev-uan-60gqi9' }}
       # AZURE_AKS_CLUSTER_RESOURCE_GROUP: ${{ vars.AZURE_AKS_CLUSTER_RESOURCE_GROUP || 'rg-ciam-dev-uaenorth-aks' }}
-      BASE_IMAGE_TAG: 2403-10.0.0.2
+      BASE_IMAGE_TAG: "2408"
       AZURE_CONTAINER_REGISTRY: "pingdevops"
       PRODUCT_NAME: "pingdirectory"
       BASE_IMAGE_ACR_REPOSITORY_URL: "baseimage.azurecr.io"
