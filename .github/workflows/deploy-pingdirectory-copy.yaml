@@ -24,6 +24,8 @@ jobs:
       ACR_REGISTRY_NAME: "pingdevops"
       ACR_REGISTRY_URL: "pingdevops.azurecr.io"
       
+
+      
     steps:
     - name: Set Release Tag Variable using Github Release tag# and Base Image tag
       id: set-image-tag

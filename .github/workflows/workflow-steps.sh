@@ -70,7 +70,7 @@ build_pingdirectory_image() {
   echo "Building $PRODUCT_NAME Image: $RELEASE_TAG"
   echo "Deploying $PRODUCT_NAME - DEV"
   echo "Logging into ACR"
-  az acr login --name pingdevops
+  az acr login --name $ACR_REGISTRY_NAME
   
   #STEP 1 - CHECK IF THE BASE IMAGE EXISTS IN THE BASE IMAGE REPOSITORY
   echo "Check if $PRODUCT_NAME Base image $BASE_IMAGE_TAG exists"
@@ -102,7 +102,9 @@ build_pingdirectory_image() {
   exit 1
   fi
 
-echo "$PRODUCT_NAME image successfully built and pushed to ACR."
+  echo "$PRODUCT_NAME image successfully built and pushed to ACR."
+  
+
 }
 
 action=${1//-/_}
