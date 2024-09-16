@@ -41,6 +41,6 @@ jobs:
     - name: Build and push Ping Directory Docker image to ACR
       run: .github/workflows/workflow-steps.sh build_pingdirectory_image
 
-    # - name: Deploy PingDirectory to DEV
-    #   run: .github/workflows/workflow-steps.sh deploy_pingdirectory_dev
+    - name: Deploy PingDirectory to DEV
+      run: .github/workflows/workflow-steps.sh deploy_pingdirectory
     
