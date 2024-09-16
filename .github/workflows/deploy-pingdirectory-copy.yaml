@@ -37,6 +37,4 @@ jobs:
 
     - name: Deploy PingDirectory to DEV
       run: .github/workflows/workflow-steps.sh deploy_pingdirectory_dev
-      
-
-pingdirectory:2408
+    
