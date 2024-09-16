@@ -66,7 +66,8 @@ deploy_pingdirectory_dev() {
   #s
   echo "Building PingDirectory Release: $RELEASE_TAG"
   echo "Deploying Ping Directory - DEV"
-
+  echo "Logging into ACR"
+  az acr login --name baseimage
   echo "Check if Base image      exists"
 
   # Check if the base image exists in the Azure Container Registry (ACR)
