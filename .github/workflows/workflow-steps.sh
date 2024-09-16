@@ -94,11 +94,11 @@ deploy_pingdirectory_dev() {
   echo "building PinDirectory image and pushing it to ACR"
   az acr build \
   --registry $ACR_REGISTRY_NAME \
-  --image $BASE_IMAGE_REPOSITORY:$BASE_IMAGE_TAG \
+  --image $BASE_IMAGE_REPOSITORY:$RELEASE_TAG \
   --build-arg ACR_REGISTRY_URL=$ACR_REGISTRY_URL \
   --build-arg BASE_IMAGE_TAG=$BASE_IMAGE_TAG \
   --build-arg BASE_IMAGE_REPOSITORY=$BASE_IMAGE_REPOSITORY \
-  .
+  -f pingdirectory/Dockerfile
 
 
 
