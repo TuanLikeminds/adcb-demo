@@ -69,8 +69,15 @@ deploy_pingdirectory_dev() {
 
   echo "Check if Base image      exists"
 
-  az acr repository show-tags --name $BASE_IMAGE_ACR_REGISTRY_URL --repository pingidentity-base-images/pingdirectory --output tsv | grep 2408
+  # Check if the base image exists in the Azure Container Registry (ACR)
+  if ! az acr repository show-tags --name $BASE_IMAGE_ACR_REGISTRY_URL --repository pingidentity-base-images/pingdirectory --output tsv | grep -q "$BASE_IMAGE_TAG"; then
+    echo "Error: Base image pingidentity-base-images/pingdirectory:$BASE_IMAGE_TAG does not exist in the ACR repository."
+    echo "Exiting the Deployment script"
+    
+    exit 1
+  fi
 
+  echo "Base image tag $BASE_IMAGE_TAG found."
   # echo "Azure login"
   # export APPSETTING_WEBSITE_SITE_NAME='azcli-workaround'
   # az login --identity --username $AZURE_IDENTITY
