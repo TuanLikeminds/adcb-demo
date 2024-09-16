@@ -86,8 +86,6 @@ build_pingdirectory_image() {
 
   echo "Base image tag $BASE_IMAGE_TAG found. $PRODUCT_NAME Image $RELEASE_TAG will be built using this image..."
 
-
-
   #STEP 2 - IF THE BASE IMAGE EXISTS, THEN INJECT THE SERVER PROFILE INTO THE IMAGE AND PUSH IT TO ACR
   echo "building $PRODUCT_NAME image and pushing it to ACR"
 
@@ -105,14 +103,6 @@ build_pingdirectory_image() {
   fi
 
 echo "$PRODUCT_NAME image successfully built and pushed to ACR."
-
-
-
-
-
-
-
-
 }
 
 action=${1//-/_}
