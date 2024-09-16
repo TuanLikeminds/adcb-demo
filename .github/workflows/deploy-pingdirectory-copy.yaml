@@ -1,4 +1,4 @@
-name: Deploy PingDirectory to GCP
+name: Deploy PingDirectory to AKS
 on:
   push:
     tags: pd-v**
