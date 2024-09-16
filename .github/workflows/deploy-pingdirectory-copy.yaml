@@ -21,7 +21,7 @@ jobs:
       BASE_IMAGE_TAG: "2408"
       AZURE_CONTAINER_REGISTRY: "pingdevops"
       PRODUCT_NAME: "pingdirectory"
-      BASE_IMAGE_ACR_REPOSITORY_URL: "baseimage.azurecr.io"
+      BASE_IMAGE_ACR_REGISTRY_URL: "baseimage.azurecr.io"
       PING_PRODUCT_ACR_REGISTRY_URL: "sfdf"
       
     steps:
