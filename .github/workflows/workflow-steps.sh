@@ -8,9 +8,10 @@ AZURE_CONTAINER_REGISTRY=$AZURE_CONTAINER_REGISTRY
 PRODUCT_NAME=$PRODUCT_NAME
 ACR_REGISTRY_URL=$ACR_REGISTRY_URL
 RELEASE_TAG=$RELEASE_TAG
-BASE_IMAGE_ACR_REGISTRY_URL=$BASE_IMAGE_ACR_REGISTRY_URL
+ACR_REGISTRY_NAME=$ACR_REGISTRY_NAME
 PING_PRODUCT_ACR_REGISTRY_URL=$PING_PRODUCT_ACR_REGISTRY_URL
 BASE_IMAGE_TAG=$BASE_IMAGE_TAG
+BASE_IMAGE_REPOSITORY=$BASE_IMAGE_REPOSITORY
 
 apply_overlays() {
   echo "Applying overlays..."
@@ -71,7 +72,7 @@ deploy_pingdirectory_dev() {
   echo "Check if Base image      exists"
 
   # Check if the base image exists in the Azure Container Registry (ACR)
-  if ! az acr repository show-tags --name $BASE_IMAGE_ACR_REGISTRY_URL --repository pingidentity-base-images/pingdirectory --output tsv | grep -q "$BASE_IMAGE_TAG"; then
+  if ! az acr repository show-tags --name $ACR_REGISTRY_NAME --repository $BASE_IMAGE_REPOSITORY --output tsv | grep -q "$BASE_IMAGE_TAG"; then
     echo "Error: Base image pingidentity-base-images/pingdirectory:$BASE_IMAGE_TAG does not exist in the ACR repository.... Exiting The Deployment Pipeline"
     
     
