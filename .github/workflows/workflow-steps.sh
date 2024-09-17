@@ -144,7 +144,7 @@ check_replicas_running() {
 }
 
 # Retry loop to wait for StatefulSet or Deployment to be fully up and running
-MAX_RETRIES=30
+MAX_RETRIES=90
 SLEEP_TIME=10
 
 for (( i=0; i<MAX_RETRIES; i++ )); do
