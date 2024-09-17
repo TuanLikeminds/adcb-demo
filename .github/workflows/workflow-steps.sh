@@ -123,9 +123,9 @@ deploy_pingdirectory_dev(){
   kubectl get pods -n ciam-dev
 }
 
-deploy_pingdirectory_staging(){
-  # TODO
-}
+# deploy_pingdirectory_staging(){
+#   # TODO
+# }
 
 
 
