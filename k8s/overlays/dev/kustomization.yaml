@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+
+resources:
+- ciam-dev
+- ../../base/nginx-ingress
+  
+replicas:
+- count: 1
+  name: ping-directory
+
+replicas:
+- count: 1
+  name: ping-authorize
+
+replicas:
+- count: 1
+  name: ping-federate
+

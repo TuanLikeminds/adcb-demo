@@ -1,0 +1,15 @@
+ID=00682307
+WSTrustSTS=true
+OAuth=true
+SaasProvisioning=true
+Product=PingFederate
+Version=12.1
+EnforcementType=3
+Tier=Subscription
+IssueDate=2024-07-22
+ExpirationDate=2025-07-31
+GracePeriod=1
+DeploymentMethod=Traditional
+Organization=ABU Dhabi Commercial Bank
+SignCode=FF1F
+Signature=302C02143E0BDB64E96007F155325A0E05B83E8B46E19BE602143B08829F3691A7CBF6DD0AF24723689071EB58A7

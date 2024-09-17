@@ -1,0 +1,14 @@
+ID=00682306
+SCIMOnly=false
+PDPAPI=true
+Product=PingAuthorize
+Version=10.0
+EnforcementType=3
+Tier=Subscription
+IssueDate=2024-07-22
+ExpirationDate=2025-07-31
+GracePeriod=1
+DeploymentMethod=Traditional
+Organization=ABU Dhabi Commercial Bank
+SignCode=FF0F
+Signature=302D021479F95CC543380478FDDFD5BB8D7790C6055B373902150085CF34F6B9942F969213302CFE7597F48BF364DF

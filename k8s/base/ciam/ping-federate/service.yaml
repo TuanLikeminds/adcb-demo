@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ping-federate-svc
+spec:
+  selector:
+    app: ping-federate
+  ports:
+    - name: https
+      protocol: TCP
+      port: 9031
+      targetPort: 9999
+  type: ClusterIP

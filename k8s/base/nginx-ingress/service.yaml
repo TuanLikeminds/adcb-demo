@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-ingress-controller
+  namespace: nginx-ingress
+  annotations:
+    # Available annotations: https://learn.microsoft.com/en-us/azure/aks/load-balancer-standard#customizations-via-kubernetes-annotations
+    service.beta.kubernetes.io/azure-load-balancer-internal: true
+    service.beta.kubernetes.io/azure-load-balancer-internal-subnet: snet-aks-ingress-controller-ciam-dev-uaenorth-001 # 10.114.67.16/28
+    service.beta.kubernetes.io/azure-load-balancer-ipv4: '10.114.67.20'

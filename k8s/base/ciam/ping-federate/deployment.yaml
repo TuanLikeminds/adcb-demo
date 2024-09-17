@@ -1,0 +1,155 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ping-federate
+spec:
+  selector:
+    matchLabels:
+      app: ping-federate
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ping-federate
+    spec:
+      containers:
+        - image: acrciamdevuanc67lyf.azurecr.io/pingfederate:latest
+          name: ping-federate
+          volumeMounts:
+            - name: pingfederate-license-volume
+              mountPath: /opt/in/instance/server/default/conf/pingfederate.lic
+              subPath: pingfederate.lic
+          ports:
+            - containerPort: 9999
+            - containerPort: 9031
+          resources:
+            requests:
+              memory: 512Mi
+              cpu: 100m
+            limits:
+              memory: 2Gi
+              cpu: 1000m
+          env:
+            - name: MUTE_LICENSE_VERIFICATION
+              value: "yes"
+            - name: BASE
+              value: "/opt"
+            - name: ROOT_USER
+              value: "administrator"
+            - name: JAVA_HOME
+              value: "/opt/java"
+            - name: STAGING_DIR
+              value: "/opt/staging"
+            - name: OUT_DIR
+              value: "/opt/out"
+            - name: SERVER_ROOT_DIR
+              value: "/opt/out/instance"
+            - name: IN_DIR
+              value: "/opt/in"
+            - name: SERVER_BITS_DIR
+              value: "/opt/server"
+            - name: BAK_DIR
+              value: "/opt/backup"
+            - name: LOGS_DIR
+              value: "/opt/logs"
+            - name: STAGING_MANIFEST
+              value: "/opt/staging-manifest.txt"
+            - name: CLEAN_STAGING_DIR
+              value: "false"
+            - name: SECRETS_DIR
+              value: "/run/secrets"
+            - name: PING_IDENTITY_ACCEPT_EULA
+              value: 'YES'
+            - name: SERVER_PROFILE_DIR
+              value: "/tmp/server-profile"
+            - name: SERVER_PROFILE_URL_REDACT
+              value: "true"
+            - name: SERVER_PROFILE_UPDATE
+              value: "true"
+            - name: SECURITY_CHECKS_STRICT
+              value: "false"
+            - name: COLORIZE_LOGS
+              value: "true"
+            - name: LOCATION_VALIDATION
+              value: "true"
+            - name: MAX_HEAP_SIZE
+              value: "1.50G"
+            - name: JVM_TUNING
+              value: "AGGRESSIVE"
+            - name: JAVA_RAM_PERCENTAGE
+              value: "75.0"
+            - name: VERBOSE
+              value: "false"
+            - name: PING_DEBUG
+              value: "false"
+            - name: PING_PRODUCT
+              value: "PingFederate"
+            - name: PING_PRODUCT_VALIDATION
+              value: "true"
+            - name: LDAP_PORT
+              value: "1389"
+            - name: LDAPS_PORT
+              value: "1636"
+            - name: HTTPS_PORT
+              value: "443"
+            - name: JMX_PORT
+              value: "1689"
+            - name: ORCHESTRATION_TYPE
+              value: ""
+            - name: USER_BASE_DN
+              value: "dc=example,dc=com"
+            - name: ROOT_USER_DN
+              value: "cn=administrator"
+            - name: ENV
+              value: "/opt/.profile"
+            - name: MOTD_URL
+              value: "https://raw.githubusercontent.com/pingidentity/pingidentity-devops-getting-started/master/motd/motd.json"
+            - name: PATH
+              value: "/opt/java/bin:/opt:/opt/out/instance/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+            - name: STARTUP_COMMAND
+              value: "/opt/out/instance/bin/run.sh"
+            - name: PF_ADMIN_PUBLIC_HOSTNAME
+              value: "ping-federate.dev.ciam-portal.internal"
+            - name: PF_ADMIN_PUBLIC_BASEURL
+              value: "https://ping-federate.dev.ciam-portal.internal:9999"
+            - name: TAIL_LOG_FILES
+              value: "/opt/out/instance/log/server.log"
+            - name: PF_LOG_SIZE_MAX
+              value: "10000 KB"
+            - name: PF_LOG_NUMBER
+              value: "2"
+            - name: PF_LOG_LEVEL
+              value: "INFO"
+            - name: PF_ADMIN_PORT
+              value: "9999"
+            - name: PF_ENGINE_PORT
+              value: "9031"
+            - name: PF_ENGINE_SECONDARY_PORT
+              value: "-1"
+            - name: PF_ENGINE_DEBUG
+              value: "false"
+            - name: PF_ADMIN_DEBUG
+              value: "false"
+            - name: PF_DEBUG_PORT
+              value: "9030"
+            - name: SHOW_LIBS_VER
+              value: "true"
+            - name: SHOW_LIBS_VER_PRE_PATCH
+              value: "false"
+            - name: OPERATIONAL_MODE
+              value: "STANDALONE"
+            - name: HSM_MODE
+              value: "OFF"
+            - name: PF_BC_FIPS_APPROVED_ONLY
+              value: "false"
+            - name: PF_HSM_HYBRID
+              value: "false"
+            - name: PF_LDAP_TYPE
+              value: "PingDirectory"
+            - name: PF_ENGINE_PUBLIC_HOSTNAME
+              value: "ping-federate.dev.ciam-portal.internal"
+      volumes:
+        - name: pingfederate-license-volume
+          secret:
+            secretName: pingfederate.lic
+            defaultMode: 420

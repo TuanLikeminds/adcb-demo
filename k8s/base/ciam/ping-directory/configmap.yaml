@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: root-user-password-configmap
+data:
+  root-user-password: |
+    T3mP!Pa$$w00rD#
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: encryption-password-configmap
+data:
+  encryption-password: |
+    T3mP!Pa$$w00rD#
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: admin-user-password-configmap
+data:
+  admin-user-password: |
+    T3mP!Pa$$w00rD# 

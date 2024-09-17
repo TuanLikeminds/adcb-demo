@@ -1,0 +1,8 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: ciam-dev
+
+resources:
+- ../../../base/ciam/ping-directory
+- ../../../base/ciam/ping-authorize
+- ../../../base/ciam/ping-federate

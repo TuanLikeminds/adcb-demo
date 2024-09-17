@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ping-directory
+spec:
+  selector:
+    matchLabels:
+      app: ping-directory
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ping-directory
+    spec:
+      containers:
+        - image: acrciamdevuanc67lyf.azurecr.io/pingdirectory:latest
+          name: ping-directory
+          volumeMounts:
+            - name: pingdirectory-license-volume
+              mountPath: "/opt/staging/pd.profile/server-root/pre-setup/PingDirectory.lic"
+              subPath: PingDirectory.lic
+          ports:
+            - containerPort: 1636
+          livenessProbe:
+          resources:
+            requests:
+              memory: 512Mi
+              cpu: 100m
+            limits:
+              memory: 2Gi
+              cpu: 1000m
+          env:
+            - name: MUTE_LICENSE_VERIFICATION
+              value: "yes"
+      volumes:
+        - name: pingdirectory-license-volume
+          secret:
+            secretName: pingdirectory-license

@@ -1,0 +1,62 @@
+#Global values#
+###############
+global:
+  addReleaseNameToResource: none
+  ingress:
+    enabled: false
+  privateCert:
+    generate: false
+  masterPassword:
+    enabled: false
+  ldap-sdk-tools:
+    enabled: false
+################
+
+volumes:
+  pingauthorize-license-volume:
+    secret:
+      secretName: pingauthorize.lic
+      defaultMode: 0744
+
+#############################################################
+# @param    pingauthorize PingAuthorize values
+#
+# @param    pingauthorize.enabled Enable PingAuthorize deployment
+# @default  false
+#############################################################
+pingauthorize:
+  enabled: true
+  name: pingauthorize
+  image:
+    name: pingauthorize
+    repositoryFqn: acrciamdevuanc67lyf.azurecr.io/pingauthorize
+    tag: latest
+
+  includeVolumes: ["pingauthorize-license-volume"]
+  # includeVolumes: ["pingdirectory-license-volume"]
+
+  volumeMounts:
+  - mountPath: /opt/in/pd.profile/server-root/pre-setup/PingAuthorize.lic
+    name: pingauthorize-license-volume
+    subPath: PingAuthorize.lic
+
+  container:
+    resources:
+      requests:
+        cpu: 0
+        memory: 1.5Gi
+      limits:
+        cpu: 2
+        memory: 4Gi
+
+  services:
+    https:
+      servicePort: 443
+      containerPort: 1443
+      ingressPort: 443
+      dataService: true
+    ldaps:
+      servicePort: 636
+      containerPort: 1636
+      clusterService: true
+    clusterServiceName: pingauthorize-cluster

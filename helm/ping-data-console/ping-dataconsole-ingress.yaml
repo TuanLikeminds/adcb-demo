@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: datasconsole-ingress-internal
+  namespace: ciam-dev
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+spec:
+  ingressClassName: nginx-internal
+  rules:
+  - host: ping-federate.dev.ciam-portal.internal
+    http:
+      paths:
+      - backend:
+          service:
+            name: pingdataconsole
+            port:
+              number: 8443
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - ping-federate.dev.ciam-portal.internal 
+    secretName: ping-fed-secret # Replace with the name of your TLS secret

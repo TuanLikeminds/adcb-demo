@@ -1,0 +1,217 @@
+#Global start here
+global:
+  addReleaseNameToResource: none
+  ingress:
+    enabled: false
+  privateCert:
+    generate: false
+  masterPassword:
+    enabled: false
+  ldap-sdk-tools:
+    enabled: false
+
+volumes:
+  pingdirectory-license-volume:
+    secret:
+      secretName: pingdirectory-license
+      defaultMode: 0744
+
+  pingdirectory-encryption-pw-volume:
+    configMap:
+      name: encryption-password-configmap
+      defaultMode: 0755
+
+  pingdirectory-root-pw-volume:
+    configMap:
+      name: root-user-password-configmap
+      defaultMode: 0755
+
+  pingdirectory-admin-pw-volume:
+    configMap:
+      name: admin-user-password-configmap
+      defaultMode: 0755
+
+#############################################################
+# @param    pingdirectory PingDirectory values
+#
+# @param    pingdirectory.enabled Enable PingDirectory deployment
+# @default  false
+#############################################################
+pingdirectory:
+  # @param    pingdirectory.cronjob CronJobs run a kubectl exec command to run commands on
+  # @desc     a utility sidecar container. They will also create the necessary ServiceAccount, Role,
+  # @desc     and RoleBinding to run the jobs
+  #
+  # @param    pingdirectory.cronjob.enabled Enable the PingDirectory CronJob
+  # @default  false
+  #
+  # @param    pingdirectory.cronjob.spec yaml to insert into the created CronJob spec. If a jobTemplate is not
+  # @desc     provided, a default template will be inserted. A schedule value must be provided
+  #
+  # @param    pingdirectory.cronjob.spec.jobTemplate
+  # @desc     yaml to override default jobTemplate.
+  #
+  # @param    pingdirectory.cronjob.image Image to run the Jobs. The image must include kubectl
+  # @default  bitname/kubectl:latest
+  #
+  # @param    pingdirectory.cronjob.args Job arguments
+  # @default  []
+  cronjob:
+    enabled: false
+    spec: {}
+      # A schedule must be set for cronjobs.
+      # Example running once every six hours:
+      # schedule: "0 */6 * * *"
+      # successfulJobsHistoryLimit: 0
+      # failedJobsHistoryLimit: 1
+    # The image can be replaced with any desired image that includes kubectl
+
+    image: bitnami/kubectl:latest
+    args: []
+  enabled: true
+  name: pingdirectory
+  image:
+    name: pingdirectory
+    repositoryFqn: acrciamdevuanc67lyf.azurecr.io/pingdirectory
+    tag: latest
+ 
+  includeVolumes: ["pingdirectory-license-volume","pingdirectory-encryption-pw-volume","pingdirectory-root-pw-volume","pingdirectory-admin-pw-volume"]
+
+  volumeMounts:
+  - mountPath: /opt/in/pd.profile/server-root/pre-setup/PingDirectory.lic
+    name: pingdirectory-license-volume
+    subPath: PingDirectory.lic
+
+  - mountPath: /run/secrets/encryption-password
+    name: pingdirectory-encryption-pw-volume
+    subPath: encryption-password
+
+  - mountPath: /run/secrets/root-user-password
+    name: pingdirectory-root-pw-volume
+    subPath: root-user-password
+
+  - mountPath: /run/secrets/admin-user-password
+    name: pingdirectory-admin-pw-volume
+    subPath: admin-user-password
+
+  container:
+    replicaCount: 2
+    resources:
+      requests:
+        cpu: 0.5
+        memory: 1Gi
+      limits:
+        cpu: 2
+        memory: 3Gi
+
+    terminationGracePeriodSeconds: 300
+
+    probes:
+      readinessProbe:
+        periodSeconds: 30
+        failureThreshold: 4
+      startupProbe:
+        periodSeconds: 10
+        failureThreshold: 180
+
+    # Example affinity for typical directory installation
+    #
+    # affinity:
+    #   podAntiAffinity:
+    #     # Add a hard requirement for each PD pod to be deployed to a different node
+    #     requiredDuringSchedulingIgnoredDuringExecution:
+    #     - labelSelector:
+    #         matchExpressions:
+    #         - key: app.kubernetes.io/name
+    #           operator: In
+    #           values:
+    #           - pingdirectory
+    #       topologyKey: "kubernetes.io/hostname"
+    #     # Add a soft requirement for each PD pod to be deployed to a different AZ
+    #     preferredDuringSchedulingIgnoredDuringExecution:
+    #     - weight: 1
+    #       podAffinityTerm:
+    #         labelSelector:
+    #           matchExpressions:
+    #           - key: app.kubernetes.io/name
+    #             operator: In
+    #             values:
+    #             - pingdirectory
+    #         topologyKey: "failure-domain.beta.kubernetes.io/zone"     <--- kubernetes prior to 1.17
+    #         topologyKey: "topology.kubernetes.io/region"              <--- kubernetes 1.17+
+
+  workload:
+    type: StatefulSet
+    statefulSet:
+      podManagementPolicy: OrderedReady
+      persistentvolume:
+        volumes:
+          out-dir:
+            persistentVolumeClaim:
+              storageClassName:  managed-csi-premium
+              resources:
+                requests:
+                  storage: 10Gi
+
+  envs:
+    USER_BASE_DN: "dc=adcb,dc=ae"
+    MUTE_LICENSE_VERIFICATION: "yes"
+    # SERVER_PROFILE_URL: https://github.com/pingidentity/pingidentity-server-profiles.git #currently testing with Ping's server profile till the private
+    # SERVER_PROFILE_PATH: baseline/pingdirectory                                          #Server profile repo is being set up
+    VERBOSE: "false" #enable debug logging mode
+    K8S_INCREMENT_PORTS: "false"
+    K8S_NUM_REPLICAS: "3"
+    #MAX_HEAP_SIZE: "1024m"
+    
+    
+
+  # @param    pingdirectory.services.serviceName.loadBalancerService If true, the
+  # @desc     per-Pod LoadBalancer services enabled with
+  # @desc     pingdirectory.services.loadBalancerServicePerPod will include this port.
+  # @default  false
+  #
+  # @param    pingdirectory.services.loadBalancerServicePerPod
+  # @desc     Set to true to create a separate LoadBalancer service for each individual
+  # @desc     Pod in the PingDirectory StatefulSet.
+  # @default  false
+  #
+  # @param    pingdirectory.services.loadBalancerExternalDNSHostnameSuffix
+  # @desc     Value used for the external-dns.alpha.kubernetes.io/hostname annotation
+  # @desc     for the LoadBalancer services. This value will be used as a suffix for
+  # @desc     the hostname for each individual pod when
+  # @desc     pingdirectory.services.loadBalancerServicePerPod is set to true.
+  services:
+    ldap:
+      servicePort: 389
+      containerPort: 1389
+      dataService: true
+    ldaps:
+      servicePort: 636
+      containerPort: 1636
+      dataService: true
+      clusterService: true
+      loadBalancerService: true
+    https:
+      servicePort: 443
+      containerPort: 1443
+      ingressPort: 443
+      dataService: true
+    replication:
+      containerPort: 8989
+      loadBalancerService: true
+    clusterServiceName: pingdirectory-cluster
+    loadBalancerServicePerPod: false
+    #loadBalancerExternalDNSHostnameSuffix: .example.com
+
+  # ingress:
+  #   hosts:
+  #     - host: pingdirectory._defaultDomain_
+  #       paths:
+  #       - path: /
+  #         pathType: Prefix
+  #         backend:
+  #           serviceName: https
+  #   tls:
+  #     - secretName: _defaultTlsSecret_
+  #       hosts:
+  #         - pingdirectory._defaultDomain_

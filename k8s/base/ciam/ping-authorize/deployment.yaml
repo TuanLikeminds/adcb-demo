@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ping-authorize
+spec:
+  selector:
+    matchLabels:
+      app: ping-authorize
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ping-authorize
+    spec:
+      containers:
+        - name: ping-authorize
+          image: acrciamdevuanc67lyf.azurecr.io/pingauthorize:latest
+          volumeMounts:
+            - name: pingauthorize-license-volume
+              mountPath: "/opt/staging/pd.profile/server-root/pre-setup/PingAuthorize.lic"
+              subPath: PingAuthorize.lic
+          ports:
+            - containerPort: 1443
+          resources:
+            requests:
+              memory: 512Mi
+              cpu: 100m
+            limits:
+              memory: 2Gi
+              cpu: 1000m
+          env:
+            - name: MUTE_LICENSE_VERIFICATION
+              value: "yes"
+      volumes:
+        - name: pingauthorize-license-volume
+          secret:
+            secretName: pingauthorize-license

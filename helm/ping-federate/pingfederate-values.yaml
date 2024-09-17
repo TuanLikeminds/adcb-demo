@@ -1,0 +1,205 @@
+#Global values#
+###############
+global:
+  addReleaseNameToResource: none
+  ingress:
+    enabled: false
+  privateCert:
+    generate: false
+  masterPassword:
+    enabled: false
+  ldap-sdk-tools:
+    enabled: false
+################
+
+volumes:
+  pingfederate-license-volume:
+    secret:
+      secretName: pingfederate.lic
+      defaultMode: 0744
+
+#############################################################
+# @param    pingfederate-admin PingFederate admin values
+#
+# @param    pingfederate-admin.enabled Enable PingFederate admin deployment
+# @default  false
+#############################################################
+pingfederate-admin:
+  enabled: true
+  name: pingfederate-admin
+  image:
+    name: pingfederate
+    repositoryFqn: acrciamdevuanc67lyf.azurecr.io/pingfederate
+    tag: latest
+ 
+
+  includeVolumes: ["pingfederate-license-volume"]
+
+  volumeMounts:
+    - name: pingfederate-license-volume
+      mountPath: /opt/in/instance/server/default/conf/pingfederate.lic
+      subPath: pingfederate.lic
+
+  container:
+    resources:
+      requests:
+        cpu: 0.5
+        memory: 1Gi
+      limits:
+        cpu: 2
+        memory: 4Gi
+
+  workload:
+    deployment:
+      strategy:
+        type: Recreate
+
+  envs: 
+    PING_IDENTITY_ACCEPT_EULA: "YES"
+    PF_ADMIN_PUBLIC_HOSTNAME: "ping-federate.dev.ciam-portal.internal"
+    PF_ADMIN_PUBLIC_BASEURL: "https://ping-federate.dev.ciam-portal.internal"
+    
+
+  # Example: If PingFederate Admin relies on pingdirectory for AuthN
+  #          Creates init container wait-for on pingdirectory ldaps service
+  #
+  # container:
+  #   waitFor:
+  #     pingdirectory:
+  #       service: ldaps
+  #       timeoutSeconds: 300
+
+  services:
+    https:
+      servicePort: 9999
+      containerPort: 9999
+      ingressPort: 443
+      dataService: true
+    clusterbind:
+      servicePort: 7600
+      containerPort: 7600
+      clusterService: true
+    clusterfail:
+      servicePort: 7700
+      containerPort: 7700
+      clusterService: true
+    clusterServiceName: pingfederate-cluster
+
+
+  
+
+  # ingress:
+  #   hosts:
+  #     - host: pingfederate-admin._defaultDomain_
+  #       paths:
+  #       - path: /
+  #         pathType: Prefix
+  #         backend:
+  #           serviceName: https
+  #   tls:
+  #     - secretName: _defaultTlsSecret_
+  #       hosts:
+  #         - pingfederate-admin._defaultDomain_
+
+#############################################################
+# @param    pingfederate-engine PingFederate engine values
+#
+# @param    pingfederate-engine.enabled Enable PingFederate engine deployment
+# @default  false
+#############################################################
+pingfederate-engine:
+  enabled: true
+  name: pingfederate-engine
+  image:
+    name: pingfederate
+    repositoryFqn: acrciamdevuanc67lyf.azurecr.io/pingfederate
+    tag: latest
+
+
+  includeVolumes: ["pingfederate-license-volume"]
+
+  volumeMounts:
+    - name: pingfederate-license-volume
+      mountPath: /opt/in/instance/server/default/conf/pingfederate.lic
+      subPath: pingfederate.lic
+
+  container:
+    resources:
+      requests:
+        cpu: 0.5
+        memory: 1Gi
+      limits:
+        cpu: 2
+        memory: 4Gi
+
+    waitFor:
+      pingfederate-admin:
+        service: https
+        timeoutSeconds: 300
+  
+
+  workload:
+    deployment:
+      strategy:
+        type: Recreate
+
+  envs:
+    PF_ADMIN_PORT: "9999"
+    PING_IDENTITY_ACCEPT_EULA: "YES"
+    PF_ENGINE_PUBLIC_HOSTNAME: "ping-federate-engine.dev.ciam-portal.internal"
+  
+  externalImage:
+    pingtoolkit: ## used by pingfed init container to check the health of the admin pod before starting
+      image:
+        name: pingtoolkit
+        repositoryFqn: acrciamdevuanc67lyf.azurecr.io/pingtoolkit
+        tag: "2405"
+      resources:
+        limits:
+          cpu: 500m
+          memory: 128Mi
+        requests:
+          cpu: 1m
+          memory: 64Mi
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+          - ALL
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        runAsUser: 9031
+        runAsGroup: 0
+        seccompProfile:
+          type: RuntimeDefault
+
+
+  services:
+    https:
+      servicePort: 9031
+      containerPort: 9031
+      ingressPort: 443
+      dataService: true
+    clusterbind:
+      servicePort: 7600
+      containerPort: 7600
+      clusterService: true
+    clusterfail:
+      servicePort: 7700
+      containerPort: 7700
+      clusterService: true
+    clusterServiceName: pingfederate-cluster
+  
+
+  # ingress:
+  #   hosts:
+  #     - host: pingfederate-engine._defaultDomain_
+  #       paths:
+  #       - path: /
+  #         pathType: Prefix
+  #         backend:
+  #           serviceName: https
+  #   tls:
+  #     - secretName: _defaultTlsSecret_
+  #       hosts:
+  #         - pingfederate-engine._defaultDomain_

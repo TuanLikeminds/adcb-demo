@@ -1,0 +1,9 @@
+# This is a comment.
+# Each line is a file pattern followed by one or more owners.
+# Reference: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners#codeowners-file-location
+
+# Teams can be specified as code owners as well. Teams should
+# be identified in the format @org/team-name. Teams must have
+# explicit write access to the repository. In this example,
+# the cibg-devops-reviewer team in the AbuDhabiCommercialBank organization owns all files.
+* @AbuDhabiCommercialBank/cibg-devops-reviewer

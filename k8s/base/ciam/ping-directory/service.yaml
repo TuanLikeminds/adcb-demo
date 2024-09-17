@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ping-directory-svc
+spec:
+  ports:
+    - port: 1636
+      name: http
+      targetPort: 1636
+  selector:
+    app: ping-directory
+  type: ClusterIP

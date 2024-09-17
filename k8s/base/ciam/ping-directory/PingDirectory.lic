@@ -1,0 +1,12 @@
+ID=00682305
+Product=PingDirectory
+Version=10.0.0.2
+EnforcementType=3
+Tier=Subscription
+IssueDate=2024-07-22
+ExpirationDate=2025-07-31
+GracePeriod=1
+DeploymentMethod=Traditional
+Organization=ABU Dhabi Commercial Bank
+SignCode=FF03
+Signature=302D02150084D999D80057934FFA78BBBBDE691DCFE10BB2B702143F0EB60AD77326C1A4DE7764B1CCA18F6B6F495C

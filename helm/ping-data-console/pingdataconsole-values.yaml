@@ -1,0 +1,72 @@
+#Global values#
+###############
+global:
+  addReleaseNameToResource: none
+  ingress:
+    enabled: false
+  privateCert:
+    generate: false
+  masterPassword:
+    enabled: false
+  ldap-sdk-tools:
+    enabled: false
+
+################
+#############################################################
+# @param    pingdataconsole PingDataConsole values
+#
+# @param    pingdataconsole.enabled Enable PingDataConsole deployment
+# @default  false
+#############################################################
+pingdataconsole:
+  enabled: true
+  name: pingdataconsole
+  image:
+    name: pingdataconsole
+    repositoryFqn: acrciamdevuanc67lyf.azurecr.io/pingdataconsole
+    tag: latest
+
+  container:
+    resources:
+      requests:
+        cpu: 0
+        memory: .5Gi
+      limits:
+        cpu: 1
+        memory: 1Gi
+
+  # @param    pingdataconsole.defaultLogin Default login details for the console
+  #
+  # @param    pingdataconsole.defaultLogin.server.host Default hostname
+  # @default  pingdirectory-cluster
+  #
+  # @param    pingdataconsole.defaultLogin.server.port Default port
+  # @default  636
+  #
+  # @param    pingdataconsole.defaultLogin.username Default username
+  # @default  administrator
+  defaultLogin:
+    server:
+      host: pingdirectory-cluster
+      port: 636
+    username: administrator
+
+  services:
+    https:
+      containerPort: 8443
+      servicePort: 8443
+      ingressPort: 443
+      dataService: true
+
+  # ingress:
+  #   hosts:
+  #     - host: pingdataconsole._defaultDomain_
+  #       paths:
+  #       - path: /
+  #         pathType: Prefix
+  #         backend:
+  #           serviceName: https
+  #   tls:
+  #     - secretName: _defaultTlsSecret_
+  #       hosts:
+  #         - pingdataconsole._defaultDomain_

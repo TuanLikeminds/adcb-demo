@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ping-federate-ing
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+spec:
+  tls:
+  - hosts: 
+    - ping-federate.dev.ciam-portal.internal
+    secretName: pingfed-tls-secret
+  ingressClassName: nginx-ingress
+  rules:
+  - host: ping-federate.dev.ciam-portal.internal
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ping-federate-svc
+            port:
+              number: 9031

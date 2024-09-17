@@ -65,11 +65,18 @@ apply_overlays() {
   kubectl get pods -n ciam-dev
 }
 
-#FUNCTION TO BUILD AND PUSH PING IMAGE TO ACR
+########## build_ping_image FUNCTION TO BUILD AND PUSH PING IMAGE TO ACR ##########
+  #1. Authenticate against ACR
+  #2. Check if base image exists
+  #3. Build ping docker image and push to ACR
+
 build_ping_image() {
-  #STEP 1 - Authenticate
+  #STEP 1 - Authenticate to aks and acr
   echo "Azure login"
-  az login --service-principal -u "6fca71cf-2e16-48fd-9c52-cb1d0f72b898" -p "tLB8Q~WhHEFU-AlG62uul4IqkMQfBE6W0I48Fa_l" --tenant "daecf046-26ba-44b7-bdd6-032e51085396"
+  export APPSETTING_WEBSITE_SITE_NAME='azcli-workaround'
+  az login --identity --username $AZURE_IDENTITY
+  az account set --subscription $AZURE_SUBSCRIPTION
+
   echo "Building $PRODUCT_NAME Image: $RELEASE_TAG"
   echo "Logging into ACR"
   az acr login --name $ACR_REGISTRY_NAME
@@ -79,7 +86,7 @@ build_ping_image() {
   #STEP 2 - CHECK IF THE BASE IMAGE EXISTS IN THE BASE IMAGE REPOSITORY
   echo "Check if $PRODUCT_NAME Base image $BASE_IMAGE_TAG exists"
   echo 
-  # Check if the base image exists in the Azure Container Registry (ACR)
+  
   if ! az acr repository show-tags --name $ACR_REGISTRY_NAME --repository $BASE_IMAGE_REPOSITORY --output tsv | grep -q "$BASE_IMAGE_TAG"; then
   #Scripts throws and exception and exits If the base image tag does not exist in ACR
     echo "Error: Base image $BASE_IMAGE_REPOSITORY:$BASE_IMAGE_TAG does not exist in the ACR repository.... Exiting The Deployment Pipeline..."
@@ -112,15 +119,34 @@ build_ping_image() {
 
 }
 
-#Deploy PingDirectory to AKS
+  #-------------------------#-------------------------#-------------------------
+  ######## deploy_pingdirectory FUNCTION TO INSTALL HELM CHART IN AKS ##########
+  #-------------------------#-------------------------#-------------------------
+  
+  #1. Install helm CLI
+  #2. Connect Obtain AKS credentials and set kubeconfig context
+  #3. Delete exisintg global-env-vars configmap
+  #5. Install the helm Release
+
+
 deploy_pingdirectory(){
   # STEP 1 - INSTALL HELM CLI
   curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
   # STEP 2 - CONNECT TO THE CLUSTER
+  echo "Setting Azure AKS credentials"
   az aks get-credentials --name $AZURE_AKS_CLUSTER_NAME --resource-group $AZURE_AKS_CLUSTER_RESOURCE_GROUP
+  # STEP 3 - SET KUBECONFIG
+  echo "Configuring Kubectl"
+  kubelogin convert-kubeconfig -l azurecli
+  # @TODO: Remove yq lines after aks-54uma725.privatelink.uaenorth.azmk8s.io gets added to InfoBlox
+  yq e -i '.clusters[].cluster.server = "https://aks-pbky1iij.hcp.uaenorth.azmk8s.io:443"' ~/.kube/config
+  yq e -i '.clusters[].cluster.certificate-authority-data = null' ~/.kube/config
+  yq e -i '.clusters[].cluster.insecure-skip-tls-verify = true' ~/.kube/config
+
+  # STEP 4 - Delete exisintg global-env-vars configmap
   kubectl delete cm global-env-vars -n $NAMESPACE
   # STEP 3 - INSTALL HELM RELEASE
-  helm upgrade --install  pingdirectory-release  ping-devops --version 0.10.0 --repo https://helm.pingidentity.com -f pingdirectory/helm/dev/pingdirectory-values.yaml --namespace $NAMESPACE  --set pingdirectory.image.tag=$RELEASE_TAG  --force 
+  helm upgrade --install  pingdirectory-release  ping-devops --version 0.10.0 --repo https://helm.pingidentity.com -f pingdirectory/helm/dev/values.yaml --namespace $NAMESPACE  --set pingdirectory.image.tag=$RELEASE_TAG  --force 
   kubectl get pods -n $NAMESPACE
   kubectl describe sts pingdirectory -n $NAMESPACE
 }
@@ -129,6 +155,9 @@ deploy_pingdirectory(){
 #   # TODO
 # }
 
+
+
+########## Healthcheck for workloads ##########
 post_deployment_healthcheck(){
 REPLICAS=$(kubectl get $WORKLOAD_TYPE $PRODUCT_NAME -n $NAMESPACE -o jsonpath='{.spec.replicas}')
 
@@ -143,8 +172,8 @@ check_replicas_running() {
 }
 
 # Retry loop to wait for StatefulSet or Deployment to be fully up and running
-MAX_RETRIES=90
-SLEEP_TIME=10
+MAX_RETRIES=60
+SLEEP_TIME=15
 
 for (( i=0; i<MAX_RETRIES; i++ )); do
   if check_replicas_running; then
