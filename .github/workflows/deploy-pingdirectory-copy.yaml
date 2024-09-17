@@ -23,7 +23,7 @@ jobs:
       PRODUCT_NAME: "pingdirectory"
       ACR_REGISTRY_NAME: "likeminds"
       ACR_REGISTRY_URL: "likeminds.azurecr.io"
-      AZURE_AKS_CLUSTER_NAME: "test-cluster"
+      AZURE_AKS_CLUSTER_NAME: "test"
       
 
 
