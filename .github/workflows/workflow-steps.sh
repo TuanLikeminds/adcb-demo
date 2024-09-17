@@ -131,7 +131,7 @@ deploy_pingdirectory(){
 
 post_deployment_healthcheck(){
 
-REPLICAS=$(kubectl get $WORKLOAD_TYPE "$$PRODUCT_NAME" -n $NAMESPACE -o jsonpath='{.spec.replicas}')
+REPLICAS=$(kubectl get $WORKLOAD_TYPE $PRODUCT_NAME -n $NAMESPACE -o jsonpath='{.spec.replicas}')
 
 # Function to check if all replicas are running
 check_replicas_running() {
