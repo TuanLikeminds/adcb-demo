@@ -56,7 +56,7 @@ apply_overlays() {
   kubectl apply -f helm/ping-directory/ingress-pingdirectory.yaml -n ciam-dev
   #kubectl create secret generic pingfederate.lic --from-file=k8s/base/ciam/ping-federate/pingfederate.lic -n ciam-dev
   kubectl delete cm global-env-vars -n ciam-dev
-  helm upgrade --install  pingdirectory-release  ping-devops --version 0.10.0 --repo https://helm.pingidentity.com -f helm/ping-directory/pingdirectory-values.yaml --namespace ciam-dev  --force 
+  # helm upgrade --install  pingdirectory-release  ping-devops --version 0.10.0 --repo https://helm.pingidentity.com -f helm/ping-directory/pingdirectory-values.yaml --namespace ciam-dev  --force 
   kubectl delete cm global-env-vars -n ciam-dev
   helm upgrade --install  pingfederate-release  ping-devops --version 0.10.0 --repo https://helm.pingidentity.com -f helm/ping-federate/pingfederate-values.yaml --namespace ciam-dev --force 
   kubectl delete cm global-env-vars -n ciam-dev
@@ -64,8 +64,10 @@ apply_overlays() {
   kubectl get deploy -o wide -n ciam-dev
   kubectl get pods -n ciam-dev
 }
-
+#-------------------------#-------------------------#-------------------------
 ########## build_ping_image FUNCTION TO BUILD AND PUSH PING IMAGE TO ACR ##########
+#-------------------------#-------------------------#-------------------------
+
   #1. Authenticate against ACR
   #2. Check if base image exists
   #3. Build ping docker image and push to ACR
@@ -156,8 +158,10 @@ deploy_pingdirectory(){
 # }
 
 
-
+#-------------------------#-------------------------#-------------------------
 ########## Healthcheck for workloads ##########
+#-------------------------#-------------------------#-------------------------
+
 post_deployment_healthcheck(){
 REPLICAS=$(kubectl get $WORKLOAD_TYPE $PRODUCT_NAME -n $NAMESPACE -o jsonpath='{.spec.replicas}')
 
