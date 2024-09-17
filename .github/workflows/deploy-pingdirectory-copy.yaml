@@ -46,7 +46,7 @@ jobs:
     - name: Deploy PingDirectory to DEV
       env:
         NAMESPACE: "ciam-dev"
-      run: .github/workflows/workflow-steps.sh deploy_pingdirectory_dev
+      run: .github/workflows/workflow-steps.sh deploy_pingdirectory
 
     - name: Check health of PingDirectory Statefulset
       env:

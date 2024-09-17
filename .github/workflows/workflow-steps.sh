@@ -112,7 +112,7 @@ build_ping_image() {
 
 }
 
-#Deploy PingDirectory to Dev Cluster
+#Deploy PingDirectory to AKS
 deploy_pingdirectory(){
   # STEP 1 - INSTALL HELM CLI
   curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
