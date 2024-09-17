@@ -24,6 +24,7 @@ jobs:
       ACR_REGISTRY_NAME: "likeminds"
       ACR_REGISTRY_URL: "likeminds.azurecr.io"
       AZURE_AKS_CLUSTER_NAME: "test"
+      AZURE_AKS_CLUSTER_RESOURCE_GROUP: "test-aks-rg"
       
 
 

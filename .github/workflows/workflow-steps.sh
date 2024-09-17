@@ -116,7 +116,7 @@ deploy_pingdirectory_dev(){
   # STEP 1 - INSTALL HELM CLI
   curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
   # STEP 2 - CONNECT TO THE DEV CLUSTER
-  az aks get-credentials --name "test" --resource-group "test-aks-rg"
+  az aks get-credentials --name $AZURE_AKS_CLUSTER_NAME --resource-group $AZURE_AKS_CLUSTER_RESOURCE_GROUP
   kubectl delete cm global-env-vars -n ciam-dev
   # STEP 3 - INSTALL HELM RELEASE
   helm upgrade --install  pingdirectory-release  ping-devops --version 0.10.0 --repo https://helm.pingidentity.com -f pingdirectory/helm/dev/pingdirectory-values.yaml --namespace ciam-dev  --set pingdirectory.image.tag=$RELEASE_TAG  --force 
