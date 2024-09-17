@@ -135,7 +135,7 @@ REPLICAS=$(kubectl get $WORKLOAD_TYPE $PRODUCT_NAME -n $NAMESPACE -o jsonpath='{
 
 # Function to check if all replicas are running
 check_replicas_running() {
-  READY_REPLICAS=$(kubectl get $WORKLOAD_TYPE "$WORKLOAD_NAME" -n $NAMESPACE -o jsonpath='{.status.readyReplicas}')
+  READY_REPLICAS=$(kubectl get $WORKLOAD_TYPE "$PRODUCT_NAME" -n $NAMESPACE -o jsonpath='{.status.readyReplicas}')
   if [[ "$READY_REPLICAS" == "$REPLICAS" ]]; then
     return 0  # All replicas are running
   else
@@ -149,7 +149,7 @@ SLEEP_TIME=10
 
 for (( i=0; i<MAX_RETRIES; i++ )); do
   if check_replicas_running; then
-    echo "All $READY_REPLICAS replicas of $WORKLOAD_TYPE '$WORKLOAD_NAME' are running."
+    echo "All $READY_REPLICAS replicas of $WORKLOAD_TYPE '$PRODUCT_NAME' are running."
     # Send notification to admin (replace with your notification system)
     # Example: echo "All replicas are running. Notify admin here."
     exit 0
