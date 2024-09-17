@@ -15,7 +15,6 @@ ACR_REGISTRY_URL=$ACR_REGISTRY_URL
 WORKLOAD_TYPE=$WORKLOAD_TYPE
 NAMESPACE=$NAMESPACE
 
-
 apply_overlays() {
   echo "Applying overlays..."
 
@@ -114,16 +113,16 @@ build_ping_image() {
 }
 
 #Deploy PingDirectory to Dev Cluster
-deploy_pingdirectory_dev(){
+deploy_pingdirectory(){
   # STEP 1 - INSTALL HELM CLI
   curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-  # STEP 2 - CONNECT TO THE DEV CLUSTER
+  # STEP 2 - CONNECT TO THE CLUSTER
   az aks get-credentials --name $AZURE_AKS_CLUSTER_NAME --resource-group $AZURE_AKS_CLUSTER_RESOURCE_GROUP
-  kubectl delete cm global-env-vars -n ciam-dev
+  kubectl delete cm global-env-vars -n $NAMESPACE
   # STEP 3 - INSTALL HELM RELEASE
-  helm upgrade --install  pingdirectory-release  ping-devops --version 0.10.0 --repo https://helm.pingidentity.com -f pingdirectory/helm/dev/pingdirectory-values.yaml --namespace ciam-dev  --set pingdirectory.image.tag=$RELEASE_TAG  --force 
-  kubectl get pods -n ciam-dev
-  kubectl describe sts pingdirectory -n ciam-dev
+  helm upgrade --install  pingdirectory-release  ping-devops --version 0.10.0 --repo https://helm.pingidentity.com -f pingdirectory/helm/dev/pingdirectory-values.yaml --namespace $NAMESPACE  --set pingdirectory.image.tag=$RELEASE_TAG  --force 
+  kubectl get pods -n $NAMESPACE
+  kubectl describe sts pingdirectory -n $NAMESPACE
 }
 
 # deploy_pingdirectory_staging(){
@@ -132,12 +131,11 @@ deploy_pingdirectory_dev(){
 
 post_deployment_healthcheck(){
 
-
-REPLICAS=$(kubectl get $WORKLOAD_TYPE "$$PRODUCT_NAME" -n -A -o jsonpath='{.spec.replicas}')
+REPLICAS=$(kubectl get $WORKLOAD_TYPE "$$PRODUCT_NAME" -n $NAMESPACE -o jsonpath='{.spec.replicas}')
 
 # Function to check if all replicas are running
 check_replicas_running() {
-  READY_REPLICAS=$(kubectl get $WORKLOAD_TYPE "$WORKLOAD_NAME" -n -A -o jsonpath='{.status.readyReplicas}')
+  READY_REPLICAS=$(kubectl get $WORKLOAD_TYPE "$WORKLOAD_NAME" -n $NAMESPACE -o jsonpath='{.status.readyReplicas}')
   if [[ "$READY_REPLICAS" == "$REPLICAS" ]]; then
     return 0  # All replicas are running
   else

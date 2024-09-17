@@ -26,7 +26,6 @@ jobs:
       AZURE_AKS_CLUSTER_NAME: "test"
       AZURE_AKS_CLUSTER_RESOURCE_GROUP: "test-aks-rg"
       WORKLOAD_TYPE: "statefulset"
-      NAMESPACE: "ciam-dev"
 
 
     steps:
@@ -45,8 +44,12 @@ jobs:
       run: .github/workflows/workflow-steps.sh build_ping_image
 
     - name: Deploy PingDirectory to DEV
+      env:
+        NAMESPACE: "ciam-dev"
       run: .github/workflows/workflow-steps.sh deploy_pingdirectory_dev
 
     - name: Check health of PingDirectory Statefulset
+      env:
+        NAMESPACE: "ciam-dev"
       run: .github/workflows/workflow-steps.sh post_deployment_healthcheck
     
