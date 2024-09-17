@@ -9,27 +9,27 @@ global:
     enabled: false
   ldap-sdk-tools:
     enabled: false
+#Global ends here
+# volumes:
+#   pingdirectory-license-volume:
+#     secret:
+#       secretName: pingdirectory-license
+#       defaultMode: 0744
 
-volumes:
-  pingdirectory-license-volume:
-    secret:
-      secretName: pingdirectory-license
-      defaultMode: 0744
+#   pingdirectory-encryption-pw-volume:
+#     configMap:
+#       name: encryption-password-configmap
+#       defaultMode: 0755
 
-  pingdirectory-encryption-pw-volume:
-    configMap:
-      name: encryption-password-configmap
-      defaultMode: 0755
+#   pingdirectory-root-pw-volume:
+#     configMap:
+#       name: root-user-password-configmap
+#       defaultMode: 0755
 
-  pingdirectory-root-pw-volume:
-    configMap:
-      name: root-user-password-configmap
-      defaultMode: 0755
-
-  pingdirectory-admin-pw-volume:
-    configMap:
-      name: admin-user-password-configmap
-      defaultMode: 0755
+#   pingdirectory-admin-pw-volume:
+#     configMap:
+#       name: admin-user-password-configmap
+#       defaultMode: 0755
 
 #############################################################
 # @param    pingdirectory PingDirectory values
@@ -75,24 +75,24 @@ pingdirectory:
     repositoryFqn: likeminds.azurecr.io/pingdirectory
     tag: latest
  
-  includeVolumes: ["pingdirectory-license-volume","pingdirectory-encryption-pw-volume","pingdirectory-root-pw-volume","pingdirectory-admin-pw-volume"]
+  # includeVolumes: ["pingdirectory-license-volume","pingdirectory-encryption-pw-volume","pingdirectory-root-pw-volume","pingdirectory-admin-pw-volume"]
 
-  volumeMounts:
-  - mountPath: /opt/in/pd.profile/server-root/pre-setup/PingDirectory.lic
-    name: pingdirectory-license-volume
-    subPath: PingDirectory.lic
+  # volumeMounts:
+  # - mountPath: /opt/in/pd.profile/server-root/pre-setup/PingDirectory.lic
+  #   name: pingdirectory-license-volume
+  #   subPath: PingDirectory.lic
 
-  - mountPath: /run/secrets/encryption-password
-    name: pingdirectory-encryption-pw-volume
-    subPath: encryption-password
+  # - mountPath: /run/secrets/encryption-password
+  #   name: pingdirectory-encryption-pw-volume
+  #   subPath: encryption-password
 
-  - mountPath: /run/secrets/root-user-password
-    name: pingdirectory-root-pw-volume
-    subPath: root-user-password
+  # - mountPath: /run/secrets/root-user-password
+  #   name: pingdirectory-root-pw-volume
+  #   subPath: root-user-password
 
-  - mountPath: /run/secrets/admin-user-password
-    name: pingdirectory-admin-pw-volume
-    subPath: admin-user-password
+  # - mountPath: /run/secrets/admin-user-password
+  #   name: pingdirectory-admin-pw-volume
+  #   subPath: admin-user-password
 
   container:
     replicaCount: 2
@@ -162,24 +162,10 @@ pingdirectory:
     K8S_INCREMENT_PORTS: "false"
     K8S_NUM_REPLICAS: "3"
     #MAX_HEAP_SIZE: "1024m"
-    
-    
+    PING_IDENTITY_DEVOPS_USER: "tuan@likemindsconsulting.com"
+    PING_IDENTITY_DEVOPS_KEY: "0b014115-5c5b-434a-914c-2a574b8cb6d3"
 
-  # @param    pingdirectory.services.serviceName.loadBalancerService If true, the
-  # @desc     per-Pod LoadBalancer services enabled with
-  # @desc     pingdirectory.services.loadBalancerServicePerPod will include this port.
-  # @default  false
-  #
-  # @param    pingdirectory.services.loadBalancerServicePerPod
-  # @desc     Set to true to create a separate LoadBalancer service for each individual
-  # @desc     Pod in the PingDirectory StatefulSet.
-  # @default  false
-  #
-  # @param    pingdirectory.services.loadBalancerExternalDNSHostnameSuffix
-  # @desc     Value used for the external-dns.alpha.kubernetes.io/hostname annotation
-  # @desc     for the LoadBalancer services. This value will be used as a suffix for
-  # @desc     the hostname for each individual pod when
-  # @desc     pingdirectory.services.loadBalancerServicePerPod is set to true.
+
   services:
     ldap:
       servicePort: 389
@@ -201,17 +187,3 @@ pingdirectory:
       loadBalancerService: true
     clusterServiceName: pingdirectory-cluster
     loadBalancerServicePerPod: false
-    #loadBalancerExternalDNSHostnameSuffix: .example.com
-
-  # ingress:
-  #   hosts:
-  #     - host: pingdirectory._defaultDomain_
-  #       paths:
-  #       - path: /
-  #         pathType: Prefix
-  #         backend:
-  #           serviceName: https
-  #   tls:
-  #     - secretName: _defaultTlsSecret_
-  #       hosts:
-  #         - pingdirectory._defaultDomain_

@@ -13,6 +13,9 @@ BASE_IMAGE_REPOSITORY=$BASE_IMAGE_REPOSITORY
 PRODUCT_NAME=$PRODUCT_NAME
 ACR_REGISTRY_URL=$ACR_REGISTRY_URL
 
+
+
+
 apply_overlays() {
   echo "Applying overlays..."
 
@@ -64,14 +67,16 @@ apply_overlays() {
 }
 
 build_pingdirectory_image() {
-
+  #STEP 1 - Authenticate
   echo "Azure login"
   az login --service-principal -u "6fca71cf-2e16-48fd-9c52-cb1d0f72b898" -p "tLB8Q~WhHEFU-AlG62uul4IqkMQfBE6W0I48Fa_l" --tenant "daecf046-26ba-44b7-bdd6-032e51085396"
   echo "Building $PRODUCT_NAME Image: $RELEASE_TAG"
   echo "Logging into ACR"
   az acr login --name $ACR_REGISTRY_NAME
+
+  #-------------------------
   
-  #STEP 1 - CHECK IF THE BASE IMAGE EXISTS IN THE BASE IMAGE REPOSITORY
+  #STEP 2 - CHECK IF THE BASE IMAGE EXISTS IN THE BASE IMAGE REPOSITORY
   echo "Check if $PRODUCT_NAME Base image $BASE_IMAGE_TAG exists"
   echo 
   # Check if the base image exists in the Azure Container Registry (ACR)
@@ -85,7 +90,9 @@ build_pingdirectory_image() {
 
   echo "Base image tag $BASE_IMAGE_TAG found. $PRODUCT_NAME Image $RELEASE_TAG will be built using this image..."
 
-  #STEP 2 - IF THE BASE IMAGE EXISTS, THEN INJECT THE SERVER PROFILE INTO THE IMAGE AND PUSH IT TO ACR
+  #-------------------------
+
+  #STEP 3 - IF THE BASE IMAGE EXISTS, THEN BUILD THE IMAGE WITH INJECTED SERVER PROFILE AND PUSH IT TO ACR
   echo "building $PRODUCT_NAME image and pushing it to ACR"
 
   if ! az acr build \
@@ -103,15 +110,21 @@ build_pingdirectory_image() {
 
   echo "$PRODUCT_NAME image successfully built and pushed to ACR."
 
-
 }
 
 deploy_pingdirectory_dev(){
+  # STEP 1 - INSTALL HELM CLI
   curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-  az aks get-credentials --name "keyvault-demo-cluster" --resource-group "pingdevops-rg"
+  # STEP 2 - CONNECT TO THE DEV CLUSTER
+  az aks get-credentials --name "test-cluster" --resource-group "test-rg"
   kubectl delete cm global-env-vars -n ciam-dev
+  # STEP 3 - INSTALL HELM RELEASE
   helm upgrade --install  pingdirectory-release  ping-devops --version 0.10.0 --repo https://helm.pingidentity.com -f pingdirectory/helm/dev/pingdirectory-values.yaml --namespace ciam-dev  --set pingdirectory.image.tag=$RELEASE_TAG  --force 
   kubectl get pods -n ciam-dev
+}
+
+deploy_pingdirectory_staging(){
+  # TODO
 }
 
 
