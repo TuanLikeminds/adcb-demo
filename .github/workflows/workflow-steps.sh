@@ -12,8 +12,8 @@ BASE_IMAGE_TAG=$BASE_IMAGE_TAG
 BASE_IMAGE_REPOSITORY=$BASE_IMAGE_REPOSITORY
 PRODUCT_NAME=$PRODUCT_NAME
 ACR_REGISTRY_URL=$ACR_REGISTRY_URL
-
-
+WORKLOAD_TYPE=$WORKLOAD_TYPE
+NAMESPACE=$NAMESPACE
 
 
 apply_overlays() {
@@ -66,7 +66,8 @@ apply_overlays() {
   kubectl get pods -n ciam-dev
 }
 
-build_pingdirectory_image() {
+#FUNCTION TO BUILD AND PUSH PING IMAGE TO ACR
+build_ping_image() {
   #STEP 1 - Authenticate
   echo "Azure login"
   az login --service-principal -u "6fca71cf-2e16-48fd-9c52-cb1d0f72b898" -p "tLB8Q~WhHEFU-AlG62uul4IqkMQfBE6W0I48Fa_l" --tenant "daecf046-26ba-44b7-bdd6-032e51085396"
@@ -112,6 +113,7 @@ build_pingdirectory_image() {
 
 }
 
+#Deploy PingDirectory to Dev Cluster
 deploy_pingdirectory_dev(){
   # STEP 1 - INSTALL HELM CLI
   curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
@@ -127,6 +129,44 @@ deploy_pingdirectory_dev(){
 # deploy_pingdirectory_staging(){
 #   # TODO
 # }
+
+post_deployment_healthcheck(){
+
+
+REPLICAS=$(kubectl get $WORKLOAD_TYPE "$$PRODUCT_NAME" -n -A -o jsonpath='{.spec.replicas}')
+
+# Function to check if all replicas are running
+check_replicas_running() {
+  READY_REPLICAS=$(kubectl get $WORKLOAD_TYPE "$WORKLOAD_NAME" -n -A -o jsonpath='{.status.readyReplicas}')
+  if [[ "$READY_REPLICAS" == "$REPLICAS" ]]; then
+    return 0  # All replicas are running
+  else
+    return 1  # Not all replicas are running
+  fi
+}
+
+# Retry loop to wait for StatefulSet or Deployment to be fully up and running
+MAX_RETRIES=30
+SLEEP_TIME=10
+
+for (( i=0; i<MAX_RETRIES; i++ )); do
+  if check_replicas_running; then
+    echo "All $READY_REPLICAS replicas of $WORKLOAD_TYPE '$WORKLOAD_NAME' are running."
+    # Send notification to admin (replace with your notification system)
+    # Example: echo "All replicas are running. Notify admin here."
+    exit 0
+  else
+    echo "Waiting for all replicas to be ready... ($READY_REPLICAS/$REPLICAS)"
+  fi
+  sleep $SLEEP_TIME
+done
+
+echo "Timed out waiting for all replicas to be ready."
+# Send failure notification (replace with your notification system)
+# Example: echo "Replicas not ready. Notify admin here."
+exit 1
+
+}
 
 
 
