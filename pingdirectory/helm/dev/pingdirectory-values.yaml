@@ -164,6 +164,7 @@ pingdirectory:
     #MAX_HEAP_SIZE: "1024m"
     PING_IDENTITY_DEVOPS_USER: "tuan@likemindsconsulting.com"
     PING_IDENTITY_DEVOPS_KEY: "0b014115-5c5b-434a-914c-2a574b8cb6d3"
+    PING_IDENTITY_ACCEPT_EULA: "YES"
 
 
   services:
