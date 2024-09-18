@@ -132,10 +132,10 @@ pingdirectory:
                   storage: 20Gi
 
   envs:
-    USER_BASE_DN: "o=adcb"
+    USER_BASE_DN: "dc=adcb,dc=ae"
     PING_IDENTITY_ACCEPT_EULA: "YES"
     BASE_CLASS: "organization"
-    BASE_ATTRIBUTE: "o"
+    BASE_ATTRIBUTE: "dc"
     BASE_VALUE: "adcb"
     MUTE_LICENSE_VERIFICATION: "yes"
     VERBOSE: "false" #enable debug logging mode

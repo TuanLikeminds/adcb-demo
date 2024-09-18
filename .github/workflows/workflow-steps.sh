@@ -153,6 +153,28 @@ deploy_pingdirectory(){
   kubectl describe sts pingdirectory -n $NAMESPACE
 }
 
+deploy_pingfederate(){
+  # STEP 1 - INSTALL HELM CLI
+  curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+  # STEP 2 - CONNECT TO THE CLUSTER
+  echo "Setting Azure AKS credentials"
+  az aks get-credentials --name $AZURE_AKS_CLUSTER_NAME --resource-group $AZURE_AKS_CLUSTER_RESOURCE_GROUP
+  # STEP 3 - SET KUBECONFIG
+  echo "Configuring Kubectl"
+  kubelogin convert-kubeconfig -l azurecli
+  # @TODO: Remove yq lines after aks-54uma725.privatelink.uaenorth.azmk8s.io gets added to InfoBlox
+  yq e -i '.clusters[].cluster.server = "https://aks-pbky1iij.hcp.uaenorth.azmk8s.io:443"' ~/.kube/config
+  yq e -i '.clusters[].cluster.certificate-authority-data = null' ~/.kube/config
+  yq e -i '.clusters[].cluster.insecure-skip-tls-verify = true' ~/.kube/config
+
+  # STEP 4 - Delete exisintg global-env-vars configmap
+  kubectl delete cm global-env-vars -n $NAMESPACE
+  # STEP 3 - INSTALL HELM RELEASE
+  helm upgrade --install  pingfederate-release  ping-devops  --version 0.10.0 --repo https://helm.pingidentity.com -f pingfederate/helm/dev/values.yaml --namespace $NAMESPACE  --set pingfederate-admin.image.tag=$RELEASE_TAG --set pingfederate-engine.image.tag=$RELEASE_TAG  --force 
+  kubectl get pods -n $NAMESPACE
+  kubectl describe sts pingdirectory -n $NAMESPACE
+}
+
 # deploy_pingdirectory_staging(){
 #   # TODO
 # }
