@@ -15,4 +15,4 @@ aci: (targetattr="ds-pwp-state-json")(version 3.0; acl "Allow test user to read 
 dn: ou=people,${USER_BASE_DN}
 objectClass: top
 objectClass: organizationalUnit
-ou: internal
+ou: people

@@ -85,23 +85,9 @@ pingfederate-admin:
       clusterService: true
     clusterServiceName: pingfederate-cluster
 
-
   
 
-  # ingress:
-  #   hosts:
-  #     - host: pingfederate-admin._defaultDomain_
-  #       paths:
-  #       - path: /
-  #         pathType: Prefix
-  #         backend:
-  #           serviceName: https
-  #   tls:
-  #     - secretName: _defaultTlsSecret_
-  #       hosts:
-  #         - pingfederate-admin._defaultDomain_
-
-#############################################################
+ #############################################################
 # @param    pingfederate-engine PingFederate engine values
 #
 # @param    pingfederate-engine.enabled Enable PingFederate engine deployment
@@ -191,15 +177,3 @@ pingfederate-engine:
     clusterServiceName: pingfederate-cluster
   
 
-  # ingress:
-  #   hosts:
-  #     - host: pingfederate-engine._defaultDomain_
-  #       paths:
-  #       - path: /
-  #         pathType: Prefix
-  #         backend:
-  #           serviceName: https
-  #   tls:
-  #     - secretName: _defaultTlsSecret_
-  #       hosts:
-  #         - pingfederate-engine._defaultDomain_

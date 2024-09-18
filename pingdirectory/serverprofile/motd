@@ -1,11 +1,7 @@
+                     PLEASE NOTE
 
-                     Security Warning
+The server profile used to configure this Ping Identity Docker Image is specifically tailored for Abu Dhabi Commercial Bank’s production environment. This configuration has been thoroughly optimized to meet operational readiness and security compliance standards.
 
-The server profile being used to configure this Ping Identity Docker Image
-is for demo and documentation purposes only. The configuration contains default
-keys/credentials etc and is not suitable for production as it carries a substantial
-security risk.
+It is critical that this configuration is only injected directly into the Docker image and not sourced from any external repositories, including GitHub. The profile provided contains all necessary configurations for secure and reliable production deployment, in line with Abu Dhabi Commercial Bank's security and operational requirements.
 
-For additional information, please see
-https://github.com/pingidentity/pingidentity-devops-getting-started/blob/master/SECURITY.md
-
+Any issues or errors encountered with this image must be promptly reported to the Bank's Identity and Security Team.
