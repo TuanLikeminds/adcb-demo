@@ -1,7 +1,7 @@
 name: Deploy PingFederate to AKS
 on:
   push:
-    tags: pf-v**
+    tags: dcons-v**
 
 
 jobs:

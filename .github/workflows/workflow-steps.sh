@@ -90,7 +90,7 @@ build_ping_image() {
   echo 
   
   if ! az acr repository show-tags --name $ACR_REGISTRY_NAME --repository $BASE_IMAGE_REPOSITORY --output tsv | grep -q "$BASE_IMAGE_TAG"; then
-  #Scripts throws and exception and exits If the base image tag does not exist in ACR
+  #Scripts throws exception and exits If the base image tag does not exist in ACR
     echo "Error: Base image $BASE_IMAGE_REPOSITORY:$BASE_IMAGE_TAG does not exist in the ACR repository.... Exiting The Deployment Pipeline..."
     echo "Push $BASE_IMAGE_REPOSITORY:$BASE_IMAGE_TAG to the $ACR_REGISTRY_NAME Registry to continue..."
     
@@ -133,7 +133,9 @@ build_ping_image() {
 
 deploy_pingdirectory(){
   # STEP 1 - INSTALL HELM CLI
+  echo "installing helm"
   curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+  echo "installing helm DONE"
   # STEP 2 - CONNECT TO THE CLUSTER
   echo "Setting Azure AKS credentials"
   az aks get-credentials --name $AZURE_AKS_CLUSTER_NAME --resource-group $AZURE_AKS_CLUSTER_RESOURCE_GROUP
@@ -148,6 +150,7 @@ deploy_pingdirectory(){
   # STEP 4 - Delete exisintg global-env-vars configmap
   kubectl delete cm global-env-vars -n $NAMESPACE
   # STEP 3 - INSTALL HELM RELEASE
+  echo "installing pingdirectory-release"
   helm upgrade --install  pingdirectory-release  ping-devops --version 0.10.0 --repo https://helm.pingidentity.com -f pingdirectory/helm/dev/values.yaml --namespace $NAMESPACE  --set pingdirectory.image.tag=$RELEASE_TAG  --force 
   kubectl get pods -n $NAMESPACE
   kubectl describe sts pingdirectory -n $NAMESPACE
@@ -155,7 +158,9 @@ deploy_pingdirectory(){
 
 deploy_pingfederate(){
   # STEP 1 - INSTALL HELM CLI
+  echo "installing helm"
   curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+  echo "installing helm DONE"
   # STEP 2 - CONNECT TO THE CLUSTER
   echo "Setting Azure AKS credentials"
   az aks get-credentials --name $AZURE_AKS_CLUSTER_NAME --resource-group $AZURE_AKS_CLUSTER_RESOURCE_GROUP
@@ -170,14 +175,11 @@ deploy_pingfederate(){
   # STEP 4 - Delete exisintg global-env-vars configmap
   kubectl delete cm global-env-vars -n $NAMESPACE
   # STEP 3 - INSTALL HELM RELEASE
+  echo "installing pingfederate-release"
   helm upgrade --install  pingfederate-release  ping-devops  --version 0.10.0 --repo https://helm.pingidentity.com -f pingfederate/helm/dev/values.yaml --namespace $NAMESPACE  --set pingfederate-admin.image.tag=$RELEASE_TAG --set pingfederate-engine.image.tag=$RELEASE_TAG  --force 
   kubectl get pods -n $NAMESPACE
-  kubectl describe sts pingdirectory -n $NAMESPACE
+  kubectl describe deploy pingfederate -n $NAMESPACE
 }
-
-# deploy_pingdirectory_staging(){
-#   # TODO
-# }
 
 
 #-------------------------#-------------------------#-------------------------

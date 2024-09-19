@@ -24,7 +24,7 @@ pf.admin.https.port=9999
 # if pf.admin.baseurl is specified. But if only pf.admin.hostname is defined,
 # then the URL will be constructed the same way as in versions of PingFederate
 # before 10.3.
-pf.admin.baseurl=
+pf.admin.baseurl=${PF_ADMIN_PUBLIC_BASEURL}
 
 #
 # This property defines the IP address over which the PingFederate 
@@ -252,7 +252,7 @@ pf.runtime.http.maxRequestBodySize=200000
 #                       protocol engine. 
 # Note: Only one node in a cluster can run the administrative console.
 # Default is STANDALONE.
-pf.operational.mode=STANDALONE
+pf.operational.mode=${OPERATIONAL_MODE}
 
 # The following properties apply only if "pf.operational.mode"
 # is *not* STANDALONE:
@@ -448,15 +448,15 @@ javax.net.ssl.sessionCacheSize=5000
 # utility. Alternatively, you can specify this property as a secret reference in the form
 # OBF:MGR:{secretManagerId}:{secretId}.
 # For more information, see the Oracle Java Networking Properties documentation.
-#http.proxyHost=<HTTP_PROXY_HOST>
-#http.proxyPort=<HTTP_PROXY_PORT>
+http.proxyHost=proxy.adcbmis.local
+http.proxyPort=8083
 #http.proxyUser=<HTTP_PROXY_USER>
 #http.proxyPassword=<HTTP_PROXY_PASSWORD>
-#https.proxyHost=<HTTPS_PROXY_HOST>
-#https.proxyPort=<HTTPS_PROXY_PORT>
+https.proxyHost=proxy.adcbmis.local
+https.proxyPort=8083
 #https.proxyUser=<HTTPS_PROXY_USER>
 #https.proxyPassword=<HTTPS_PROXY_PASSWORD>
-#http.nonProxyHosts=*.internal.com|localhost
+http.nonProxyHosts=*.internal.com|localhost
 
 # You should only use digest authentication with proxy servers. Basic authentication is
 # not recommended because the proxy credentials are transmitted to the server without

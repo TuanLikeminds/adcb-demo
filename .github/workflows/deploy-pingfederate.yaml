@@ -44,9 +44,9 @@ jobs:
     - name: Deploy PingFederate to DEV
       env:
         NAMESPACE: "ciam-dev"
-      run: .github/workflows/workflow-steps.sh deploy_pingdirectory
+      run: .github/workflows/workflow-steps.sh deploy_pingfederate
 
-    - name: Check PingDirectory Statefulset health
+    - name: Check PingFederate Deployment health
       env:
         NAMESPACE: "ciam-dev"
       run: .github/workflows/workflow-steps.sh post_deployment_healthcheck

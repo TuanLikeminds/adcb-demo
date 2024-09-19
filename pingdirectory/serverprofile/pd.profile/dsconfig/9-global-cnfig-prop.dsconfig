@@ -1,0 +1,1 @@
+dsconfig set-global-configuration-prop --set configuration-server-group:all-servers
