@@ -1,0 +1,11 @@
+"addonProfiles": {
+    "azureKeyvaultSecretsProvider": {
+      "config": {
+        "enableSecretRotation": "false",
+        "rotationPollInterval": "2m"
+      },
+      "enabled": true,
+      "identity": {
+        "clientId": "56512586-e22a-4809-a179-a07ad5a6b6e1",
+        "objectId": "ca79abc7-a977-4696-8640-b8624b02525b",
+        "resourceId": "/subscriptions/0ce9c6c4-e874-4748-8bb3-db7a8637215c/resourcegroups/MC_test-aks-rg_test-cluster_eastus/providers/Microsoft.ManagedIdentity/userAssignedIdentities/azurekeyvaultsecretsprovider-test-cluster"

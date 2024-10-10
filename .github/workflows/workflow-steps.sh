@@ -156,6 +156,10 @@ deploy_pingdirectory(){
   kubectl describe sts pingdirectory -n $NAMESPACE
 }
 
+  #-------------------------#-------------------------#-------------------------
+  ######## deploy_pingfederate FUNCTION TO INSTALL HELM CHART IN AKS ##########
+  #-------------------------#-------------------------#-------------------------
+
 deploy_pingfederate(){
   # STEP 1 - INSTALL HELM CLI
   echo "installing helm"
@@ -187,6 +191,18 @@ deploy_pingfederate(){
 #-------------------------#-------------------------#-------------------------
 
 post_deployment_healthcheck(){
+
+# STEP 2 - CONNECT TO THE CLUSTER
+  echo "Setting Azure AKS credentials"
+  az aks get-credentials --name $AZURE_AKS_CLUSTER_NAME --resource-group $AZURE_AKS_CLUSTER_RESOURCE_GROUP
+  # STEP 3 - SET KUBECONFIG
+  echo "Configuring Kubectl"
+  kubelogin convert-kubeconfig -l azurecli
+  # @TODO: Remove yq lines after aks-54uma725.privatelink.uaenorth.azmk8s.io gets added to InfoBlox
+  yq e -i '.clusters[].cluster.server = "https://aks-pbky1iij.hcp.uaenorth.azmk8s.io:443"' ~/.kube/config
+  yq e -i '.clusters[].cluster.certificate-authority-data = null' ~/.kube/config
+  yq e -i '.clusters[].cluster.insecure-skip-tls-verify = true' ~/.kube/config
+  
 REPLICAS=$(kubectl get $WORKLOAD_TYPE $PRODUCT_NAME -n $NAMESPACE -o jsonpath='{.spec.replicas}')
 
 # Function to check if all replicas are running

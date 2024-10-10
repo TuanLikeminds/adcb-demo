@@ -1,0 +1,21 @@
+dsconfig create-virtual-attribute \
+    --name 'isRegistered - False'  \
+    --type constructed  \
+    --set enabled:true  \
+    --set attribute-type:isregistered  \
+    --set base-dn:ou=people,dc=adcb,dc=ae  \
+    --set filter:(&(!(userPassword=*))(objectClass=adcbCustomer))  \
+    --set conflict-behavior:virtual-overrides-real  \
+    --set multiple-virtual-attribute-evaluation-order-index:1000  \
+    --set value-pattern:false 
+
+dsconfig create-virtual-attribute \
+    --name 'isRegistered - True'  \
+    --type constructed  \
+    --set enabled:true  \
+    --set attribute-type:isregistered  \
+    --set base-dn:ou=people,dc=adcb,dc=ae  \
+    --set filter:(&(userPassword=*)(objectClass=adcbCustomer))  \
+    --set conflict-behavior:virtual-overrides-real  \
+    --set multiple-virtual-attribute-evaluation-order-index:1001  \
+    --set value-pattern:True 

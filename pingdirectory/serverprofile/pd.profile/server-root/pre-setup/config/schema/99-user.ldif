@@ -1,0 +1,7 @@
+dn: cn=schema
+objectClass: top
+objectClass: ldapSubentry
+objectClass: subschema
+cn: schema
+attributeTypes: ( isRegistered-OID NAME 'isRegistered' SINGLE-VALUE USAGE userApplications )
+objectClasses: ( adcbCustomer-OID NAME 'adcbCustomer' AUXILIARY MAY isRegistered )
