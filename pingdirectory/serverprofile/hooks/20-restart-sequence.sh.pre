@@ -3,7 +3,7 @@
 DIRECTORY="/run/secrets/"
 echo "Converting env files to .env files!"
 # Loop through each file that starts with "env"
-cp /tmp/pingdirectory-secrets/. /run/secrets/
+cp -r /tmp/pingdirectory-secrets/* /run/secrets/
 for file in "$DIRECTORY"/env*; do
   # Check if it's a file
   if [[ -f "$file" ]]; then
