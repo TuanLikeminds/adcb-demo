@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 # Directory containing the files
 DIRECTORY="/run/secrets/"
-
+echo "Converting env files to .env files!"
 # Loop through each file that starts with "env"
 for file in "$DIRECTORY"/env*; do
   # Check if it's a file
