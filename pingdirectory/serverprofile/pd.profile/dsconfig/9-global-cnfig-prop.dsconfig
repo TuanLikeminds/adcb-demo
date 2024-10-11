@@ -1,12 +1,12 @@
 dsconfig set-global-configuration-prop --set configuration-server-group:all-servers
 
-dsconfig set-global-configuration-prop \
-    --set shared-local-db-backend-database-cache-percent:36 
+#dsconfig set-global-configuration-prop \
+#    --set shared-local-db-backend-database-cache-percent:36 
 
-dsconfig set-backend-prop \
-    --backend-name userRoot  \
-    --set db-cache-percent:36  \
-    --reset db-import-cache-percent 
+#dsconfig set-backend-prop \
+#    --backend-name userRoot  \
+#    --set db-cache-percent:36  \
+#    --reset db-import-cache-percent 
 
 
 dsconfig set-crypto-manager-prop \
