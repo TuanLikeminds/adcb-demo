@@ -9,5 +9,5 @@ dsconfig set-global-configuration-prop --set configuration-server-group:all-serv
 #    --reset db-import-cache-percent 
 
 
-dsconfig set-crypto-manager-prop \
-    --reset ssl-encryption 
+#dsconfig set-crypto-manager-prop \
+#    --reset ssl-encryption 
