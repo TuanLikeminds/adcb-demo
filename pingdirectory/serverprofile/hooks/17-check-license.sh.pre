@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+echo converting License file!
+cat /run/secrets/pingdirectory-secrets/PingDirectory-license | base64 --decode > /opt/staging/pd.profile/server-root/pre-setup/PingDirectory.lic
