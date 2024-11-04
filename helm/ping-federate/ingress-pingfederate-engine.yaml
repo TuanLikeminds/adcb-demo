@@ -18,6 +18,7 @@ spec:
               number: 9031
         path: /
         pathType: Prefix
+
   tls:
   - hosts:
     - ping-fedengine.dev.ciam-portal.internal  # Same domain as above

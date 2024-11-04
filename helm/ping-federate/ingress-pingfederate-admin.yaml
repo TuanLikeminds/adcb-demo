@@ -23,3 +23,5 @@ spec:
   - hosts:
     - ping-fedadmin.dev.ciam-portal.internal  # Same domain as above
     secretName: keyvault-pingfederate-admin-console-ingress-internal # Replace with the name of your TLS secret
+
+

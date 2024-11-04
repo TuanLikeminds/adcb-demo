@@ -11,25 +11,20 @@ global:
     enabled: false
 #Global ends here
 volumes:
-  pingdirectory-license-volume:
-    secret:
-      secretName: pingdirectory-license
-      defaultMode: 0744
+  pingdirectory-secrets-volume:
+    csi:
+        driver: secrets-store.csi.k8s.io
+        readOnly: true
+        volumeAttributes:
+          secretProviderClass: "azure-kvname-user-msi"
 
-  pingdirectory-encryption-pw-volume:
-    configMap:
-      name: encryption-password-configmap
-      defaultMode: 0755
+  # configuration-archive-volume:
+  #   persistentVolumeClaim:  
+  #     claimName: azurefile  
+  #     readOnly: true
+    
 
-  pingdirectory-root-pw-volume:
-    configMap:
-      name: root-user-password-configmap
-      defaultMode: 0755
 
-  pingdirectory-admin-pw-volume:
-    configMap:
-      name: admin-user-password-configmap
-      defaultMode: 0755
 
 #############################################################
 # @param    pingdirectory PingDirectory values
@@ -38,11 +33,33 @@ volumes:
 # @default  false
 #############################################################
 pingdirectory:
-
+  # @param    pingdirectory.cronjob CronJobs run a kubectl exec command to run commands on
+  # @desc     a utility sidecar container. They will also create the necessary ServiceAccount, Role,
+  # @desc     and RoleBinding to run the jobs
+  #
+  # @param    pingdirectory.cronjob.enabled Enable the PingDirectory CronJob
+  # @default  false
+  #
+  # @param    pingdirectory.cronjob.spec yaml to insert into the created CronJob spec. If a jobTemplate is not
+  # @desc     provided, a default template will be inserted. A schedule value must be provided
+  #
+  # @param    pingdirectory.cronjob.spec.jobTemplate
+  # @desc     yaml to override default jobTemplate.
+  #
+  # @param    pingdirectory.cronjob.image Image to run the Jobs. The image must include kubectl
+  # @default  bitname/kubectl:latest
+  #
+  # @param    pingdirectory.cronjob.args Job arguments
+  # @default  []
   cronjob:
     enabled: false
     spec: {}
- 
+      # A schedule must be set for cronjobs.
+      # Example running once every six hours:
+      # schedule: "0 */6 * * *"
+      # successfulJobsHistoryLimit: 0
+      # failedJobsHistoryLimit: 1
+    # The image can be replaced with any desired image that includes kubectl
 
     image: bitnami/kubectl:latest
     args: []
@@ -50,37 +67,41 @@ pingdirectory:
   name: pingdirectory
   image:
     name: pingdirectory
-    repositoryFqn: acrciamdevuanc67lyf.azurecr.io/pingdirectory
-    tag: latest
+    # repositoryFqn: likeminds.azurecr.io/pingdirectory
+    # tag: latest
  
-  includeVolumes: ["pingdirectory-license-volume","pingdirectory-encryption-pw-volume","pingdirectory-root-pw-volume","pingdirectory-admin-pw-volume"]
+  includeVolumes: ["pingdirectory-secrets-volume"]
 
   volumeMounts:
-  - mountPath: /opt/in/pd.profile/server-root/pre-setup/PingDirectory.lic
-    name: pingdirectory-license-volume
-    subPath: PingDirectory.lic
+  # # - mountPath: /opt/in/pd.profile/server-root/pre-setup/PingDirectory.lic
+  # #   name: pingdirectory-license-volume
+  # #   subPath: PingDirectory.lic
 
-  - mountPath: /run/secrets/encryption-password
-    name: pingdirectory-encryption-pw-volume
-    subPath: encryption-password
+  - mountPath: /run/secrets/pingdirectory-secrets
+    name: pingdirectory-secrets-volume
 
-  - mountPath: /run/secrets/root-user-password
-    name: pingdirectory-root-pw-volume
-    subPath: root-user-password
+  # - mountPath: /opt/in/configuration-archive-volume
+  #   name: configuration-archive-volume
+    # subPath: pingdirectory-secrets
+    # readOnly: true
 
-  - mountPath: /run/secrets/admin-user-password
-    name: pingdirectory-admin-pw-volume
-    subPath: admin-user-password
+  # - mountPath: /run/secrets/root-user-password
+  #   name: pingdirectory-root-pw-volume
+  #   subPath: root-user-password
+
+  # - mountPath: /run/secrets/admin-user-password
+  #   name: pingdirectory-admin-pw-volume
+  #   subPath: admin-user-password
 
   container:
     replicaCount: 2
     resources:
       requests:
-        cpu: 0.5
-        memory: 1Gi
+        cpu: 2
+        memory: 6Gi
       limits:
         cpu: 2
-        memory: 3Gi
+        memory: 6Gi
 
     terminationGracePeriodSeconds: 300
 
@@ -91,6 +112,11 @@ pingdirectory:
       startupProbe:
         periodSeconds: 10
         failureThreshold: 180
+    
+    envFrom: 
+    - secretRef:
+        name: pingdirectory-svc-acc-passwords
+        optional: true
 
     # Example affinity for typical directory installation
     #
@@ -129,21 +155,33 @@ pingdirectory:
               storageClassName:  managed-csi-premium
               resources:
                 requests:
-                  storage: 20Gi
+                  storage: 10Gi
+
+
+   
+  
+    
 
   envs:
     USER_BASE_DN: "dc=adcb,dc=ae"
-    PING_IDENTITY_ACCEPT_EULA: "YES"
-    BASE_CLASS: "organization"
-    BASE_ATTRIBUTE: "dc"
-    BASE_VALUE: "adcb"
     MUTE_LICENSE_VERIFICATION: "yes"
+    # SERVER_PROFILE_URL: https://github.com/pingidentity/pingidentity-server-profiles.git #currently testing with Ping's server profile till the private
+    # SERVER_PROFILE_PATH: baseline/pingdirectory                                          #Server profile repo is being set up
     VERBOSE: "false" #enable debug logging mode
     K8S_INCREMENT_PORTS: "false"
     K8S_NUM_REPLICAS: "3"
     #MAX_HEAP_SIZE: "1024m"
-    
-
+    # PING_IDENTITY_DEVOPS_USER: "tuan@likemindsconsulting.com"
+    # PING_IDENTITY_DEVOPS_KEY: "0b014115-5c5b-434a-914c-2a574b8cb6d3"
+    PING_IDENTITY_ACCEPT_EULA: "YES"
+    SERVER_PROFILE_URL: https://github.com/TuanLikeminds/adcb-demo.git
+    SERVER_PROFILE_PATH: pingdirectory/serverprofile
+    BASE_CLASS: "domain"
+    BASE_ATTRIBUTE: "dc"
+    BASE_VALUE: "adcb"
+    ROOT_USER_PASSWORD_FILE: "/run/secrets/pingdirectory-secrets/root-user-password"
+    ADMIN_USER_PASSWORD_FILE: "/run/secrets/pingdirectory-secrets/admin-user-password"
+    ENCRYPTION_PASSWORD_FILE: "/run/secrets/pingdirectory-secrets/encryption-password"
 
 
   services:
@@ -167,6 +205,3 @@ pingdirectory:
       loadBalancerService: true
     clusterServiceName: pingdirectory-cluster
     loadBalancerServicePerPod: false
-
-
- 

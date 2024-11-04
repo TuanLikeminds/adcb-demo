@@ -64,6 +64,25 @@ apply_overlays() {
   kubectl get deploy -o wide -n ciam-dev
   kubectl get pods -n ciam-dev
 }
+
+
+#-------------------------#-------------------------#-------------------------
+########## Function to log into AKS ##########
+#-------------------------#-------------------------#-------------------------
+
+authenticate_with_aks(){
+  echo "Setting Azure AKS credentials"
+  az aks get-credentials --name $AZURE_AKS_CLUSTER_NAME --resource-group $AZURE_AKS_CLUSTER_RESOURCE_GROUP
+  # STEP 3 - SET KUBECONFIG
+  echo "Configuring Kubectl"
+  kubelogin convert-kubeconfig -l azurecli
+  # @TODO: Remove yq lines after aks-54uma725.privatelink.uaenorth.azmk8s.io gets added to InfoBlox
+  yq e -i '.clusters[].cluster.server = "https://aks-pbky1iij.hcp.uaenorth.azmk8s.io:443"' ~/.kube/config
+  yq e -i '.clusters[].cluster.certificate-authority-data = null' ~/.kube/config
+  yq e -i '.clusters[].cluster.insecure-skip-tls-verify = true' ~/.kube/config
+
+}
+
 #-------------------------#-------------------------#-------------------------
 ########## build_ping_image FUNCTION TO BUILD AND PUSH PING IMAGE TO ACR ##########
 #-------------------------#-------------------------#-------------------------
@@ -137,16 +156,8 @@ deploy_pingdirectory(){
   curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
   echo "installing helm DONE"
   # STEP 2 - CONNECT TO THE CLUSTER
-  echo "Setting Azure AKS credentials"
-  az aks get-credentials --name $AZURE_AKS_CLUSTER_NAME --resource-group $AZURE_AKS_CLUSTER_RESOURCE_GROUP
-  # STEP 3 - SET KUBECONFIG
-  echo "Configuring Kubectl"
-  kubelogin convert-kubeconfig -l azurecli
-  # @TODO: Remove yq lines after aks-54uma725.privatelink.uaenorth.azmk8s.io gets added to InfoBlox
-  yq e -i '.clusters[].cluster.server = "https://aks-pbky1iij.hcp.uaenorth.azmk8s.io:443"' ~/.kube/config
-  yq e -i '.clusters[].cluster.certificate-authority-data = null' ~/.kube/config
-  yq e -i '.clusters[].cluster.insecure-skip-tls-verify = true' ~/.kube/config
-
+  # call auth function
+  authenticate_with_aks
   # STEP 4 - Delete exisintg global-env-vars configmap
   kubectl delete cm global-env-vars -n $NAMESPACE
   # STEP 3 - INSTALL HELM RELEASE
@@ -167,14 +178,8 @@ deploy_pingfederate(){
   echo "installing helm DONE"
   # STEP 2 - CONNECT TO THE CLUSTER
   echo "Setting Azure AKS credentials"
-  az aks get-credentials --name $AZURE_AKS_CLUSTER_NAME --resource-group $AZURE_AKS_CLUSTER_RESOURCE_GROUP
-  # STEP 3 - SET KUBECONFIG
-  echo "Configuring Kubectl"
-  kubelogin convert-kubeconfig -l azurecli
-  # @TODO: Remove yq lines after aks-54uma725.privatelink.uaenorth.azmk8s.io gets added to InfoBlox
-  yq e -i '.clusters[].cluster.server = "https://aks-pbky1iij.hcp.uaenorth.azmk8s.io:443"' ~/.kube/config
-  yq e -i '.clusters[].cluster.certificate-authority-data = null' ~/.kube/config
-  yq e -i '.clusters[].cluster.insecure-skip-tls-verify = true' ~/.kube/config
+  # call auth function
+  authenticate_with_aks
 
   # STEP 4 - Delete exisintg global-env-vars configmap
   kubectl delete cm global-env-vars -n $NAMESPACE
@@ -194,14 +199,8 @@ post_deployment_healthcheck(){
 
 # STEP 2 - CONNECT TO THE CLUSTER
   echo "Setting Azure AKS credentials"
-  az aks get-credentials --name $AZURE_AKS_CLUSTER_NAME --resource-group $AZURE_AKS_CLUSTER_RESOURCE_GROUP
-  # STEP 3 - SET KUBECONFIG
-  echo "Configuring Kubectl"
-  kubelogin convert-kubeconfig -l azurecli
-  # @TODO: Remove yq lines after aks-54uma725.privatelink.uaenorth.azmk8s.io gets added to InfoBlox
-  yq e -i '.clusters[].cluster.server = "https://aks-pbky1iij.hcp.uaenorth.azmk8s.io:443"' ~/.kube/config
-  yq e -i '.clusters[].cluster.certificate-authority-data = null' ~/.kube/config
-  yq e -i '.clusters[].cluster.insecure-skip-tls-verify = true' ~/.kube/config
+  # call auth function
+  authenticate_with_aks
   
 REPLICAS=$(kubectl get $WORKLOAD_TYPE $PRODUCT_NAME -n $NAMESPACE -o jsonpath='{.spec.replicas}')
 
