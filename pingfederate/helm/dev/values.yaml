@@ -19,6 +19,7 @@ volumes:
         readOnly: true
         volumeAttributes:
           secretProviderClass: "pingfederate-secrets-provider-class"
+          
 
 #############################################################
 # @param    pingfederate-admin PingFederate admin values
@@ -48,6 +49,11 @@ pingfederate-admin:
         cpu: 2
         memory: 4Gi
 
+    envFrom: 
+    - secretRef:
+        name: pingfederate-svc-acc-passwords
+        optional: true
+
   workload:
     deployment:
       strategy:
@@ -58,7 +64,7 @@ pingfederate-admin:
     PF_ADMIN_PUBLIC_HOSTNAME: "ping-federate.dev.ciam-portal.internal"
     PF_ADMIN_PUBLIC_BASEURL: "https://ping-federate.dev.ciam-portal.internal"
     SERVER_PROFILE_URL: https://github.com/TuanLikeminds/adcb-demo.git
-    SERVER_PROFILE_PATH: pingdirectory/serverprofile
+    SERVER_PROFILE_PATH: pingfederate/serverprofile
     
 
   # Example: If PingFederate Admin relies on pingdirectory for AuthN
@@ -99,16 +105,14 @@ pingfederate-engine:
   name: pingfederate-engine
   image:
     name: pingfederate
-    repositoryFqn: acrciamdevuanc67lyf.azurecr.io/pingfederate
-    tag: latest
+ 
 
 
-  includeVolumes: ["pingfederate-license-volume"]
+  includeVolumes: ["pingfederate-secrets-volume"]
 
   volumeMounts:
-    - name: pingfederate-license-volume
-      mountPath: /opt/in/instance/server/default/conf/pingfederate.lic
-      subPath: pingfederate.lic
+    - mountPath: /run/secrets/pingfederate-secrets
+      name: pingfederate-secrets-volume
 
   container:
     resources:
@@ -123,17 +127,26 @@ pingfederate-engine:
       pingfederate-admin:
         service: https
         timeoutSeconds: 300
+
+    envFrom: 
+    - secretRef:
+        name: pingfederate-svc-acc-passwords
+        optional: true
   
 
   workload:
     deployment:
       strategy:
-        type: Recreate
+        type: RollingUpdate
 
   envs:
     PF_ADMIN_PORT: "9999"
     PING_IDENTITY_ACCEPT_EULA: "YES"
     PF_ENGINE_PUBLIC_HOSTNAME: "ping-federate-engine.dev.ciam-portal.internal"
+    PF_ADMIN_PUBLIC_HOSTNAME: "ping-federate.dev.ciam-portal.internal"
+    PF_ADMIN_PUBLIC_BASEURL: "https://ping-federate.dev.ciam-portal.internal"
+    SERVER_PROFILE_URL: https://github.com/TuanLikeminds/adcb-demo.git
+    SERVER_PROFILE_PATH: pingfederate/serverprofile
   
   externalImage:
     pingtoolkit: ## used by pingfed init container to check the health of the admin pod before starting
