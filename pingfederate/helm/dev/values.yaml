@@ -13,10 +13,12 @@ global:
 ################
 
 volumes:
-  pingfederate-license-volume:
-    secret:
-      secretName: pingfederate.lic
-      defaultMode: 0744
+  pingfederate-secrets-volume:
+    csi:
+        driver: secrets-store.csi.k8s.io
+        readOnly: true
+        volumeAttributes:
+          secretProviderClass: "pingfederate-secrets-provider-class"
 
 #############################################################
 # @param    pingfederate-admin PingFederate admin values
@@ -29,16 +31,13 @@ pingfederate-admin:
   name: pingfederate-admin
   image:
     name: pingfederate
-    repositoryFqn: acrciamdevuanc67lyf.azurecr.io/pingfederate
-    tag: latest
- 
 
-  includeVolumes: ["pingfederate-license-volume"]
+
+  includeVolumes: ["pingfederate-secrets-volume"]
 
   volumeMounts:
-    - name: pingfederate-license-volume
-      mountPath: /opt/in/instance/server/default/conf/pingfederate.lic
-      subPath: pingfederate.lic
+    - mountPath: /run/secrets/pingfederate-secrets
+      name: pingfederate-secrets-volume
 
   container:
     resources:
@@ -52,7 +51,7 @@ pingfederate-admin:
   workload:
     deployment:
       strategy:
-        type: Recreate
+        type: RollingUpdate
 
   envs: 
     PING_IDENTITY_ACCEPT_EULA: "YES"

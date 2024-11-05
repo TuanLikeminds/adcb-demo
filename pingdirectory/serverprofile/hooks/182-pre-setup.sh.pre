@@ -1,4 +1,5 @@
 #!/usr/bin/env sh
 echo converting License file!
-cat /run/secrets/pingdirectory-secrets/PingDirectory-license | base64 decode > /opt/staging/pd.profile/server-root/pre-setup/PingDirectory.lic
+mkdir -p /opt/in/instance/server/default/conf/
+cat /run/secrets/pingdirectory-secrets/PingDirectory-license | base64 decode > /opt/in/instance/server/default/conf/PingDirectory.lic
 echo License file injected to /opt/staging/pd.profile/server-root/pre-setup/PingDirectory.lic!

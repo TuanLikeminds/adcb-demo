@@ -171,8 +171,8 @@ pingdirectory:
     K8S_INCREMENT_PORTS: "false"
     K8S_NUM_REPLICAS: "3"
     #MAX_HEAP_SIZE: "1024m"
-    PING_IDENTITY_DEVOPS_USER: "tuan@likemindsconsulting.com"
-    PING_IDENTITY_DEVOPS_KEY: "0b014115-5c5b-434a-914c-2a574b8cb6d3"
+    # PING_IDENTITY_DEVOPS_USER: "tuan@likemindsconsulting.com"
+    # PING_IDENTITY_DEVOPS_KEY: "0b014115-5c5b-434a-914c-2a574b8cb6d3"
     PING_IDENTITY_ACCEPT_EULA: "YES"
     SERVER_PROFILE_URL: https://github.com/TuanLikeminds/adcb-demo.git
     SERVER_PROFILE_PATH: pingdirectory/serverprofile
