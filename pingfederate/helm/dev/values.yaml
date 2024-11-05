@@ -37,7 +37,7 @@ pingfederate-admin:
   includeVolumes: ["pingfederate-secrets-volume"]
 
   volumeMounts:
-    - mountPath: /run/secrets
+    - mountPath: /run/secrets/pingfederate-secrets
       name: pingfederate-secrets-volume
 
   container:
@@ -65,6 +65,9 @@ pingfederate-admin:
     PF_ADMIN_PUBLIC_BASEURL: "https://ping-federate.dev.ciam-portal.internal"
     SERVER_PROFILE_URL: https://github.com/TuanLikeminds/adcb-demo.git
     SERVER_PROFILE_PATH: pingfederate/serverprofile
+    PING_IDENTITY_DEVOPS_KEY: "0b014115-5c5b-434a-914c-2a574b8cb6d3"
+    PING_IDENTITY_DEVOPS_USER: "tuan@likemindsconsulting.com"
+    
     
 
   # Example: If PingFederate Admin relies on pingdirectory for AuthN
@@ -147,6 +150,9 @@ pingfederate-engine:
     PF_ADMIN_PUBLIC_BASEURL: "https://ping-federate.dev.ciam-portal.internal"
     SERVER_PROFILE_URL: https://github.com/TuanLikeminds/adcb-demo.git
     SERVER_PROFILE_PATH: pingfederate/serverprofile
+    PING_IDENTITY_DEVOPS_KEY: "0b014115-5c5b-434a-914c-2a574b8cb6d3"
+    PING_IDENTITY_DEVOPS_USER: "tuan@likemindsconsulting.com"
+    
   
   externalImage:
     pingtoolkit: ## used by pingfed init container to check the health of the admin pod before starting

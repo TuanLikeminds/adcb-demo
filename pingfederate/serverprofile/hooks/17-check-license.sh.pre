@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
 echo converting License file!
 mkdir -p /opt/in/instance/server/default/conf/
-cat /run/secrets/pingfederate-license | base64 decode > /opt/in/instance/server/default/conf/pingfederate.lic
+cat /run/secrets/pingfederate-secrets/pingfederate-license | base64 decode > /opt/in/instance/server/default/conf/pingfederate.lic
 echo License file injected to /opt/in/instance/server/default/conf/pingfederate.lic!
