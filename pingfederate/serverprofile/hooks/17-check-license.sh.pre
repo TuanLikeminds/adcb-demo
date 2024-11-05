@@ -1,5 +1,31 @@
 #!/usr/bin/env sh
-echo converting License file!
-mkdir -p /opt/in/instance/server/default/conf/
-cat /run/secrets/pingfederate-secrets/pingfederate-license | base64 decode > /opt/in/instance/server/default/conf/pingfederate.lic
-echo License file injected to /opt/in/instance/server/default/conf/pingfederate.lic!
+
+set -e  # Exit on any error
+
+# Define paths
+LICENSE_SOURCE="/run/secrets/pingfederate-secrets/pingfederate-license"
+LICENSE_DESTINATION_DIR="/opt/in/instance/server/default/conf/"
+LICENSE_DESTINATION="${LICENSE_DESTINATION_DIR}pingfederate.lic"
+
+# Ensure the source license file exists
+if [ ! -f "$LICENSE_SOURCE" ]; then
+    echo "Error: License file not found at $LICENSE_SOURCE. Please check the path and try again."
+    exit 1
+fi
+
+echo "Converting License file..."
+
+# Create destination directory if it doesn't exist
+mkdir -p "$LICENSE_DESTINATION_DIR"
+if [ $? -ne 0 ]; then
+    echo "Error: Failed to create directory $LICENSE_DESTINATION_DIR."
+    exit 1
+fi
+
+# Decode the license file and write it to the destination
+if cat "$LICENSE_SOURCE" | base64 --decode > "$LICENSE_DESTINATION"; then
+    echo "License file successfully injected to $LICENSE_DESTINATION!"
+else
+    echo "Error: Failed to decode and write the license file. Please verify the base64 encoding."
+    exit 1
+fi
