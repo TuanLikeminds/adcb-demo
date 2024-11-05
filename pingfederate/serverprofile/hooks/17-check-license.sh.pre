@@ -8,6 +8,8 @@ LICENSE_DESTINATION_DIR="/opt/in/instance/server/default/conf/"
 LICENSE_DESTINATION="${LICENSE_DESTINATION_DIR}pingfederate.lic"
 
 # Ensure the source license file exists
+
+cat /run/secrets/pingfederate-secrets/pingfederate-license
 if [ ! -f "$LICENSE_SOURCE" ]; then
     echo "Error: License file not found at $LICENSE_SOURCE. Please check the path and try again."
     exit 1
