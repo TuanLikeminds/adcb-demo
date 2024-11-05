@@ -23,7 +23,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Decode the license file and write it to the destination
-if cat "$LICENSE_SOURCE" | base64 --decode > "$LICENSE_DESTINATION"; then
+if cat "$LICENSE_SOURCE" | base64 decode > "$LICENSE_DESTINATION"; then
     echo "License file successfully injected to $LICENSE_DESTINATION!"
 else
     echo "Error: Failed to decode and write the license file. Please verify the base64 encoding."
