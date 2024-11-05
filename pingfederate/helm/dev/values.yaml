@@ -57,6 +57,8 @@ pingfederate-admin:
     PING_IDENTITY_ACCEPT_EULA: "YES"
     PF_ADMIN_PUBLIC_HOSTNAME: "ping-federate.dev.ciam-portal.internal"
     PF_ADMIN_PUBLIC_BASEURL: "https://ping-federate.dev.ciam-portal.internal"
+    SERVER_PROFILE_URL: https://github.com/TuanLikeminds/adcb-demo.git
+    SERVER_PROFILE_PATH: pingdirectory/serverprofile
     
 
   # Example: If PingFederate Admin relies on pingdirectory for AuthN
